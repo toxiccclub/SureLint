@@ -75,7 +75,7 @@ int main(int argc, const char** argv) {
             // Если их > 1 => это что-то вида a.b.c (иерархия).
             auto parts = collectStringConsts(fC, iid);
 
-            if (parts.size() > 1) {
+            if (parts.size() >= 1) {
                 // Найдём файл/строку где этот узел расположен
                 auto fileId = fC->getFileId(iid);
                 std::string fileName = std::string(FileSystem::getInstance()->toPath(fileId));
