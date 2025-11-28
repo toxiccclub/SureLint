@@ -8,4 +8,4 @@
 
 void runAllRules(const SURELOG::FileContent* fC);
 
-void runAllRulesOnDesign(SURELOG::Design* design);
+void runAllRulesOnDesign(SURELOG::Design* design, const vpiHandle &UHDMdesign);

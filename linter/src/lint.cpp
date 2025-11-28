@@ -21,18 +21,20 @@ int main(int argc, const char** argv) {
     bool success = clp->parseCommandLine(argc, argv);
     Design* the_design = nullptr;
     scompiler* compiler = nullptr;
+    vpiHandle UHDMdesign = nullptr;
 
     if (success && !clp->help()) {
         compiler = start_compiler(clp);
         the_design = get_design(compiler);
+        UHDMdesign = get_uhdm_design(compiler);
     }
 
-    if (!the_design) {
+    if (!the_design && !UHDMdesign) {
         std::cerr << "No design created" << std::endl;
         return 1;
     }
 
-    runAllRulesOnDesign(the_design);
+    runAllRulesOnDesign(the_design, UHDMdesign);
 
     if (success && !clp->help()) {
         shutdown_compiler(compiler);

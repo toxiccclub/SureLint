@@ -1,0 +1,14 @@
+#pragma once
+
+#include "Surelog/Design/Design.h"
+
+using namespace SURELOG;
+
+namespace Analyzer{
+
+std::string findVariableName(const FileContent* fC, NodeId propId);
+
+void checkClassVariableLifetime(const FileContent* fC);
+
+}
+

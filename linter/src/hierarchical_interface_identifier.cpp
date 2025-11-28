@@ -12,6 +12,8 @@
 
 using namespace SURELOG;
 
+namespace Analyzer{
+
 // Вспомогательная функция: получить все StringConst внутри заданного узла
 static std::vector<NodeId> collectStringConsts(const FileContent* fC, NodeId node) {
     std::vector<NodeId> out;
@@ -32,59 +34,25 @@ static std::string joinNames(const FileContent* fC, const std::vector<NodeId>& p
     return res;
 }
 
-int main(int argc, const char** argv) {
-    uint32_t code = 0;
-
-    auto* symbolTable = new SymbolTable();
-    auto* errors = new ErrorContainer(symbolTable);
-    auto* clp = new CommandLineParser(errors, symbolTable, false, false);
-
-    clp->noPython();
-    clp->setParse(true);
-    clp->setCompile(true);
-    clp->setElaborate(true);
-    clp->setwritePpOutput(true);
-    clp->setCacheAllowed(false);
-
-    bool success = clp->parseCommandLine(argc, argv);
-    Design* the_design = nullptr;
-    scompiler* compiler = nullptr;
-
-    if (success && !clp->help()) {
-        compiler = start_compiler(clp);
-        the_design = get_design(compiler);
-    }
-
-    if (!the_design) {
-        std::cerr << "No design created" << std::endl;
-        return 1;
-    }
-
-    // ---- Проход по всем файлам и поиск проблемных Interface_identifier ----
-    for (auto& it : the_design->getAllFileContents()) {
-        const FileContent* fC = it.second;
-        if (!fC) continue;
+void checkHierarchicalInterfaceIdentifier(const FileContent* fC) {
 
         NodeId root = fC->getRootNode();
 
-        // Собираем все узлы, которые представляют Interface_identifier
-        auto interfaceIdNodes = fC->sl_collect_all(root, VObjectType::paInterface_identifier);
+        // Ищем interface_identifier
+        auto iidNodes = fC->sl_collect_all(root, VObjectType::paInterface_identifier);
 
-        for (NodeId iid : interfaceIdNodes) {
-            // Собираем все StringConst внутри этого Interface_identifier.
-            // Если их > 1 => это что-то вида a.b.c (иерархия).
+        for (NodeId iid : iidNodes) {
+
             auto parts = collectStringConsts(fC, iid);
 
+            // Если частей > 1 — это иерархическое имя → нарушение
             if (parts.size() >= 1) {
-                // Найдём файл/строку где этот узел расположен
                 auto fileId = fC->getFileId(iid);
-                std::string fileName = std::string(FileSystem::getInstance()->toPath(fileId));
                 uint32_t line = fC->Line(iid);
+                std::string fileName = std::string(FileSystem::getInstance()->toPath(fileId));
 
-                // Собираем полное имя для вывода
                 std::string fullName = joinNames(fC, parts);
 
-                // Выводим ошибку
                 std::cerr << "Error HIERARCHICAL_INTERFACE_IDENTIFIER: hierarchical interface identifier '"
                           << fullName
                           << "' not allowed at "
@@ -92,13 +60,4 @@ int main(int argc, const char** argv) {
             }
         }
     }
-
-    if (success && !clp->help()) {
-        shutdown_compiler(compiler);
-    }
-
-    delete clp;
-    delete symbolTable;
-
-    return code;
 }

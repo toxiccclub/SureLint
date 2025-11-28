@@ -13,9 +13,9 @@
 
 using namespace SURELOG;
 
-// ------------------------------------------------------------
+namespace Analyzer{
+
 // Извлекаем имя переменной из Variable_decl_assignment
-// ------------------------------------------------------------
 std::string findVarName(const FileContent* fC, NodeId dataDecl) {
     auto lists = fC->sl_collect_all(dataDecl, VObjectType::paList_of_variable_decl_assignments);
     for (NodeId list : lists) {
@@ -29,9 +29,7 @@ std::string findVarName(const FileContent* fC, NodeId dataDecl) {
     return "<unknown>";
 }
 
-// ------------------------------------------------------------
 // Проверка наличия явного типа
-// ------------------------------------------------------------
 bool hasExplicitType(const FileContent* fC, NodeId dataDecl) {
     static const VObjectType typeNodes[] = {
         VObjectType::paNet_type,
@@ -51,41 +49,7 @@ bool hasExplicitType(const FileContent* fC, NodeId dataDecl) {
     return false;
 }
 
-// ------------------------------------------------------------
-// MAIN
-// ------------------------------------------------------------
-int main(int argc, const char** argv) {
-    uint32_t code = 0;
-
-    auto* symbolTable = new SymbolTable();
-    auto* errors = new ErrorContainer(symbolTable);
-    auto* clp = new CommandLineParser(errors, symbolTable, false, false);
-
-    clp->noPython();
-    clp->setParse(true);
-    clp->setCompile(true);
-    clp->setElaborate(true);
-    clp->setCacheAllowed(false);
-    clp->setwritePpOutput(true);
-
-    bool success = clp->parseCommandLine(argc, argv);
-    Design* design = nullptr;
-    scompiler* compiler = nullptr;
-
-    if (success && !clp->help()) {
-        compiler = start_compiler(clp);
-        design = get_design(compiler);
-    }
-
-    if (!design) {
-        std::cerr << "No design created\n";
-        return 1;
-    }
-
-    // ------ Посещаем все файлы ------
-    for (auto& it : design->getAllFileContents()) {
-        const FileContent* fC = it.second;
-        if (!fC) continue;
+void checkImplicitDataTypeInDeclaration(const FileContent* fC) {
 
         NodeId root = fC->getRootNode();
 
@@ -94,35 +58,27 @@ int main(int argc, const char** argv) {
 
         for (NodeId dataDecl : dataDecls) {
 
-            // Проверяем есть ли Packed_dimension перед типом
             auto packedDims = fC->sl_collect_all(dataDecl, VObjectType::paPacked_dimension);
             if (packedDims.empty()) continue;
 
-            // Проверяем, что нет типа
             if (hasExplicitType(fC, dataDecl))
-                continue; // тип есть → нарушения нет
+                continue;
 
-            // Теперь IMPLICIT_DATA_TYPE_IN_DECLARATION
+            // Ошибка IMPLICIT_DATA_TYPE_IN_DECLARATION
             std::string varName = findVarName(fC, dataDecl);
 
-            NodeId where = packedDims.front();  
-            auto fileId = fC->getFileId(where);
+            NodeId where = packedDims.front();
+            std::string fileName = std::string(
+                FileSystem::getInstance()->toPath(fC->getFileId(where)));
             uint32_t line = fC->Line(where);
-            std::string filename = std::string(FileSystem::getInstance()->toPath(fileId));
 
-            std::cerr << "Error IMPLICIT_DATA_TYPE_IN_DECLARATION: variable '"
-                      << varName
-                      << "' declared without explicit type at "
-                      << filename << ":" << line << std::endl;
+            std::cerr
+                << "Error IMPLICIT_DATA_TYPE_IN_DECLARATION: variable '"
+                << varName
+                << "' declared without explicit type at "
+                << fileName << ":" << line
+                << std::endl;
         }
     }
-
-    if (success && !clp->help()) {
-        shutdown_compiler(compiler);
-    }
-
-    delete clp;
-    delete symbolTable;
-
-    return code;
 }
+
