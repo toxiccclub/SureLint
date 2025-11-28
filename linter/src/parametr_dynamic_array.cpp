@@ -12,6 +12,8 @@
 
 using namespace SURELOG;
 
+namespace Analyzer {
+
 std::string findParamName(const FileContent* fC, NodeId paramDeclId) {
     // List_of_param_assignments
     auto listNodes = fC->sl_collect_all(paramDeclId, VObjectType::paList_of_param_assignments);
@@ -29,83 +31,47 @@ std::string findParamName(const FileContent* fC, NodeId paramDeclId) {
     return "<unknown>";
 }
 
-int main(int argc, const char** argv) {
-    uint32_t code = 0;
-
-    auto* symbolTable = new SymbolTable();
-    auto* errors = new ErrorContainer(symbolTable);
-    auto* clp = new CommandLineParser(errors, symbolTable, false, false);
-
-    clp->noPython();
-    clp->setParse(true);
-    clp->setCompile(true);
-    clp->setElaborate(true);
-    clp->setwritePpOutput(true);
-    clp->setCacheAllowed(false);
-
-    bool success = clp->parseCommandLine(argc, argv);
-    Design* the_design = nullptr;
-    scompiler* compiler = nullptr;
-
-    if (success && !clp->help()) {
-        compiler = start_compiler(clp);
-        the_design = get_design(compiler);
-    }
-
-    if (!the_design) {
-        std::cerr << "No design created" << std::endl;
-        return 1;
-    }
-
-    // ---------------------
-    // Обход всех файлов AST
-    // ---------------------
-    for (auto& it : the_design->getAllFileContents()) {
-        const FileContent* fC = it.second;
-        if (!fC) continue;
+// -------------------------
+// Основная проверка правила
+// -------------------------
+void checkParameterDynamicArray(const FileContent* fC) {
 
         NodeId root = fC->getRootNode();
 
-        // Ищем Parameter_declaration и Local_parameter_declaration
+        // типы параметрических деклараций
         std::vector<VObjectType> declTypes = {
             VObjectType::paParameter_declaration,
             VObjectType::paLocal_parameter_declaration
         };
 
         for (auto declType : declTypes) {
-            auto paramDeclNodes = fC->sl_collect_all(root, declType);
+            auto paramDecls = fC->sl_collect_all(root, declType);
 
-            for (NodeId paramDeclId : paramDeclNodes) {
+            for (NodeId decl : paramDecls) {
 
-                // Имя параметра
-                std::string paramName = findParamName(fC, paramDeclId);
+                std::string paramName = findParamName(fC, decl);
 
-                // Проверяем есть ли Unsized_dimension внутри данного параметра
-                auto unsizedDims = fC->sl_collect_all(paramDeclId, VObjectType::paUnsized_dimension);
+                auto unsizedDims =
+                    fC->sl_collect_all(decl, VObjectType::paUnsized_dimension);
+
                 if (!unsizedDims.empty()) {
 
-                    // Берём первый узел ошибки
+                    // Первый узел ошибки
                     NodeId errNode = unsizedDims[0];
-                    auto fileId = fC->getFileId(errNode);
-                    std::string fileName = std::string(FileSystem::getInstance()->toPath(fileId));
+
+                    std::string fileName =
+                        std::string(FileSystem::getInstance()->toPath(
+                            fC->getFileId(errNode)));
+
                     uint32_t line = fC->Line(errNode);
 
-                    // Выводим сообщение о нарушении правила
-                    std::cerr << "Error PARAMETER_DYNAMIC_ARRAY: parameter '"
-                              << paramName
-                              << "' uses unsized (dynamic) unpacked array dimension at "
-                              << fileName << ":" << line << std::endl;
+                    std::cerr
+                        << "Error PARAMETER_DYNAMIC_ARRAY: parameter '"
+                        << paramName
+                        << "' uses unsized (dynamic) unpacked array dimension at "
+                        << fileName << ":" << line << std::endl;
                 }
             }
         }
     }
-
-    if (success && !clp->help()) {
-        shutdown_compiler(compiler);
-    }
-
-    delete clp;
-    delete symbolTable;
-
-    return code;
 }
