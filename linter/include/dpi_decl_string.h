@@ -4,7 +4,7 @@
 
 using namespace SURELOG;
 
-namespace Analyzer{
+namespace Analyzer {
 
 void checkDpiDeclarationString(const FileContent* fC);
 

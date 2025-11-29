@@ -2,6 +2,7 @@
 
 #include <string>
 #include <vector>
+
 #include "Surelog/Design/FileContent.h"
 #include "Surelog/SourceCompile/VObjectTypes.h"
 
@@ -9,10 +10,12 @@ using namespace SURELOG;
 
 namespace Analyzer {
 
-static std::vector<NodeId> collectStringConsts(const FileContent* fC, NodeId node);
+static std::vector<NodeId> collectStringConsts(const FileContent* fC,
+                                               NodeId node);
 
-static std::string joinNames(const FileContent* fC, const std::vector<NodeId>& parts);
+static std::string joinNames(const FileContent* fC,
+                             const std::vector<NodeId>& parts);
 
 void checkHierarchicalInterfaceIdentifier(const FileContent* fC);
 
-}
+}  // namespace Analyzer
