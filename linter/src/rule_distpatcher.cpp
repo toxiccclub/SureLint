@@ -14,24 +14,24 @@
 
 using namespace SURELOG;
 
-void runAllRules(const FileContent* fC) {
+void runAllRules(const FileContent* fC, ErrorContainer* errors, SymbolTable* symbols) {
   Analyzer::checkRepetitionInSequence(fC);
   Analyzer::checkPrototypeReturnDataType(fC);
   Analyzer::checkParameterDynamicArray(fC);
   Analyzer::checkImplicitDataTypeInDeclaration(fC);
   Analyzer::checkHierarchicalInterfaceIdentifier(fC);
   Analyzer::checkDpiDeclarationString(fC);
-  Analyzer::checkClassVariableLifetime(fC);
+  Analyzer::checkClassVariableLifetime(fC, errors, symbols);
 }
 
-void runAllRulesOnDesign(Design* design, const vpiHandle& UHDMdesign) {
+void runAllRulesOnDesign(Design* design, const vpiHandle& UHDMdesign, ErrorContainer* errors, SymbolTable* symbols) {
   if (!design) return;
 
   for (auto& it : design->getAllFileContents()) {
     const FileContent* fC = it.second;
     if (!fC) continue;
 
-    runAllRules(fC);
+    runAllRules(fC, errors, symbols);
     FatalListener listener;
     listener.listen(UHDMdesign);
   }

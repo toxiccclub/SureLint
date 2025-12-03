@@ -17,6 +17,8 @@ int main(int argc, const char** argv) {
   clp->setElaborate(true);
   clp->setwritePpOutput(true);
   clp->setCacheAllowed(false);
+  clp->setFilterInfo();
+  clp->setFilterNote();
 
   bool success = clp->parseCommandLine(argc, argv);
   Design* the_design = nullptr;
@@ -34,7 +36,9 @@ int main(int argc, const char** argv) {
     return 1;
   }
 
-  runAllRulesOnDesign(the_design, UHDMdesign);
+  runAllRulesOnDesign(the_design, UHDMdesign, errors, symbolTable);
+
+  errors->printMessages(clp->muteStdout());
 
   if (success && !clp->help()) {
     shutdown_compiler(compiler);

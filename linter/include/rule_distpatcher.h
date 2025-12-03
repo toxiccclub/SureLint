@@ -7,6 +7,8 @@
 #include "Surelog/ErrorReporting/ErrorContainer.h"
 #include "Surelog/SourceCompile/SymbolTable.h"
 
-void runAllRules(const SURELOG::FileContent* fC);
+using namespace SURELOG;
 
-void runAllRulesOnDesign(SURELOG::Design* design, const vpiHandle& UHDMdesign);
+void runAllRules(const FileContent* fC, ErrorContainer* errors, SymbolTable* symbols);
+
+void runAllRulesOnDesign(Design* design, const vpiHandle& UHDMdesign, ErrorContainer* errors, SymbolTable* symbols);

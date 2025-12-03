@@ -33,7 +33,7 @@ std::string findVariableName(const FileContent* fC, NodeId propId) {
   return "<unknown>";
 }
 
-void checkClassVariableLifetime(const FileContent* fC) {
+void checkClassVariableLifetime(const FileContent* fC, ErrorContainer* errors, SymbolTable* symbols) {
   NodeId root = fC->getRootNode();
 
   // Ищем все Class_declaration
@@ -52,14 +52,24 @@ void checkClassVariableLifetime(const FileContent* fC) {
       for (NodeId autoId : autoNodes) {
         std::string varName = findVariableName(fC, propId);
 
+        // Получаем позицию в файле
         auto fileId = fC->getFileId(autoId);
-        std::string fileName =
-            std::string(FileSystem::getInstance()->toPath(fileId));
         uint32_t line = fC->Line(autoId);
+        uint32_t column = 0;
+        
+        try {
+          column = fC->Column(autoId);
+        } catch (...) {
+          column = 0;
+        }
 
-        std::cerr << "Error CLASS_VARIABLE_LIFETIME: variable '" << varName
-                  << "' uses automatic lifetime at " << fileName << ":" << line
-                  << std::endl;
+        SymbolId obj = symbols->registerSymbol(varName);
+
+        Location loc(fileId, line, column, obj);
+        Error err(ErrorDefinition::LINT_CLASS_VARIABLE_LIFETIME, loc);
+
+        // Добавляем ошибку; второй аргумент = showDuplicates
+        errors->addError(err, false);
       }
     }
   }

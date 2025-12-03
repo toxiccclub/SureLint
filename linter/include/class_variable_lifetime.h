@@ -8,6 +8,6 @@ namespace Analyzer {
 
 std::string findVariableName(const FileContent* fC, NodeId propId);
 
-void checkClassVariableLifetime(const FileContent* fC);
+void checkClassVariableLifetime(const FileContent* fC, ErrorContainer* errors, SymbolTable* symbols);
 
-}  // namespace Analyzer
+}
