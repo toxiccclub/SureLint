@@ -74,7 +74,7 @@ void checkRepetitionInSequence(const FileContent* fC, ErrorContainer* errors,
         SymbolId obj = symbols->registerSymbol(seqName);
 
         Location loc(fileId, line, column, obj);
-        Error err(ErrorDefinition::REPETITION_IN_SEQUENCE, loc);
+        Error err(ErrorDefinition::LINT_REPETITION_IN_SEQUENCE, loc);
 
         errors->addError(err, false);
       }

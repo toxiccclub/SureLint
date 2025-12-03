@@ -58,14 +58,14 @@ void checkFunctionPrototype(const FileContent* fC, NodeId protoId,
     SymbolId obj = symbols->registerSymbol(funcName);
 
     Location loc(fileId, line, column, obj);
-    Error err(ErrorDefinition::PROTOTYPE_RETURN_DATA_TYPE, loc);
+    Error err(ErrorDefinition::LINT_PROTOTYPE_RETURN_DATA_TYPE, loc);
 
     errors->addError(err, false);
   }
 }
 
 void checkPrototypeReturnDataType(const FileContent* fC, ErrorContainer* errors,
-                                  SymbolTable* symbols, ) {
+                                  SymbolTable* symbols) {
   NodeId root = fC->getRootNode();
 
   // 1. Классы

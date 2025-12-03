@@ -69,7 +69,7 @@ void checkParameterDynamicArray(const FileContent* fC, ErrorContainer* errors,
 
         Location loc(fileId, line, column, obj);
 
-        Error err(ErrorDefinition::PARAMETER_DYNAMIC_ARRAY, loc);
+        Error err(ErrorDefinition::LINT_PARAMETR_DYNAMIC_ARRAY, loc);
 
         errors->addError(err, false);
       }

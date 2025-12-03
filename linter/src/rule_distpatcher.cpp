@@ -34,7 +34,7 @@ void runAllRulesOnDesign(Design* design, const vpiHandle& UHDMdesign,
     if (!fC) continue;
 
     runAllRules(fC, errors, symbols);
-    FatalListener listener;
+    FatalListener listener(fC, errors, symbols);
     listener.listen(UHDMdesign);
   }
 }

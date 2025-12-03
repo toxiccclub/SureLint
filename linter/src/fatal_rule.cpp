@@ -8,6 +8,7 @@
 
 #include "Surelog/API/Surelog.h"
 #include "Surelog/CommandLine/CommandLineParser.h"
+#include "Surelog/Common/FileSystem.h"
 #include "Surelog/ErrorReporting/ErrorContainer.h"
 #include "Surelog/SourceCompile/SymbolTable.h"
 
@@ -15,6 +16,8 @@
 #include <uhdm/VpiListener.h>
 #include <uhdm/uhdm.h>
 #include <uhdm/vpi_user.h>
+
+using namespace SURELOG;
 
 void FatalListener::listen(const vpiHandle& design) {
   if (!design) return;
@@ -31,15 +34,24 @@ void FatalListener::enterSys_func_call(const UHDM::sys_func_call* object,
 
   const char* file = nullptr;
   int line = 0;
+  int column = 0;
   if (handle) {
     file = vpi_get_str(vpiFile, handle);
     line = vpi_get(vpiLineNo, handle);
+    try {
+      column = vpi_get(vpiColumnNo, handle);
+    } catch (...) {
+      column = 0;
+    }
   }
 
   const UHDM::VectorOfany* args = object->Tf_call_args();
   if (!args || args->empty()) {
-    std::cout << "Error: $fatal has no arguments at "
-              << (file ? file : "<unknown>") << ":" << line << "\n";
+    SymbolId msgSym = symbols_->registerSymbol("$fatal has no arguments");
+    PathId fileId = FileSystem::getInstance()->toPathId(file, symbols_);
+    Location loc(fileId, line, column, msgSym);
+    Error err(ErrorDefinition::LINT_FATAL_SYSCALL, loc);
+    errors_->addError(err, false);
     return;
   }
 
@@ -90,24 +102,38 @@ void FatalListener::enterSys_func_call(const UHDM::sys_func_call* object,
 
   if (isInteger) {
     if (!(val == 0 || val == 1 || val == 2)) {
-      std::cout << "Error: $fatal first argument must be 0, 1, or 2. Got "
-                << val << " at " << (file ? file : "<unknown>") << ":" << line
-                << "\n";
+      SymbolId obj = symbols_->registerSymbol(
+          "$fatal first argument must be 0, 1, or 2. Got " +
+          std::to_string(val));
+      PathId fileId = FileSystem::getInstance()->toPathId(file, symbols_);
+      Location loc(fileId, line, column, obj);
+      Error err(ErrorDefinition::LINT_FATAL_SYSCALL, loc);
+      errors_->addError(err, false);
     }
   } else {
-    std::cout << "Error: $fatal first argument is not constant at "
-              << (file ? file : "<unknown>") << ":" << line << "\n";
+    SymbolId obj = symbols_->registerSymbol("first argument is not constant");
+    PathId fileId = FileSystem::getInstance()->toPathId(file, symbols_);
+    Location loc(fileId, line, column, obj);
+    Error err(ErrorDefinition::LINT_FATAL_SYSCALL, loc);
+    errors_->addError(err, false);
   }
 
   // SECOND ARG (message)
   if (args->size() > 1) {
     auto secondArg = (*args)[1];
     if (!dynamic_cast<UHDM::constant*>(secondArg)) {
-      std::cout << "Warning: $fatal message is not a string constant at "
-                << (file ? file : "<unknown>") << ":" << line << "\n";
+      SymbolId obj =
+          symbols_->registerSymbol("$fatal message is not string constant");
+      PathId fileId = FileSystem::getInstance()->toPathId(file, symbols_);
+      Location loc(fileId, line, column, obj);
+      Error err(ErrorDefinition::LINT_FATAL_SYSCALL, loc);
+      errors_->addError(err, false);
     }
   } else {
-    std::cout << "Warning: $fatal missing message at "
-              << (file ? file : "<unknown>") << ":" << line << "\n";
+    SymbolId obj = symbols_->registerSymbol("$fatal missing message");
+    PathId fileId = FileSystem::getInstance()->toPathId(file, symbols_);
+    Location loc(fileId, line, column, obj);
+    Error err(ErrorDefinition::LINT_FATAL_SYSCALL, loc);
+    errors_->addError(err, false);
   }
 }

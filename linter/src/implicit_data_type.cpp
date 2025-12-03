@@ -77,7 +77,7 @@ void checkImplicitDataTypeInDeclaration(const FileContent* fC,
 
     Location loc(fileId, line, column, obj);
 
-    Error err(ErrorDefinition::IMPLICIT_DATA_TYPE_IN_DECLARATION, loc);
+    Error err(ErrorDefinition::LINT_IMPLICIT_DATA_TYPE, loc);
 
     errors->addError(err, false);
   }
