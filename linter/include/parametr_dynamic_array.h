@@ -10,7 +10,8 @@ using namespace SURELOG;
 
 namespace Analyzer {
 
-void checkParameterDynamicArray(const FileContent* fC);
+void checkParameterDynamicArray(const FileContent* fC, ErrorContainer* errors,
+                                SymbolTable* symbols);
 
 std::string findParamName(const FileContent* fC, NodeId paramDeclId);
 

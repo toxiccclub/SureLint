@@ -18,7 +18,7 @@ void runAllRules(const FileContent* fC, ErrorContainer* errors,
                  SymbolTable* symbols) {
   Analyzer::checkRepetitionInSequence(fC);
   Analyzer::checkPrototypeReturnDataType(fC);
-  Analyzer::checkParameterDynamicArray(fC);
+  Analyzer::checkParameterDynamicArray(fC, errors, symbols);
   Analyzer::checkImplicitDataTypeInDeclaration(fC, errors, symbols);
   Analyzer::checkHierarchicalInterfaceIdentifier(fC, errors, symbols);
   Analyzer::checkDpiDeclarationString(fC, errors, symbols);

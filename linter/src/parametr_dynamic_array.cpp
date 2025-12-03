@@ -34,7 +34,8 @@ std::string findParamName(const FileContent* fC, NodeId paramDeclId) {
   return "<unknown>";
 }
 
-void checkParameterDynamicArray(const FileContent* fC) {
+void checkParameterDynamicArray(const FileContent* fC, ErrorContainer* errors,
+                                SymbolTable* symbols) {
   NodeId root = fC->getRootNode();
 
   // типы параметрических деклараций
@@ -55,14 +56,22 @@ void checkParameterDynamicArray(const FileContent* fC) {
         // Первый узел ошибки
         NodeId errNode = unsizedDims[0];
 
-        std::string fileName = std::string(
-            FileSystem::getInstance()->toPath(fC->getFileId(errNode)));
-
+        auto fileId = fC->getFileId(errNode);
         uint32_t line = fC->Line(errNode);
+        uint32_t column = 0;
+        try {
+          column = fC->Column(errNode);
+        } catch (...) {
+          column = 0;
+        }
 
-        std::cerr << "Error PARAMETER_DYNAMIC_ARRAY: parameter '" << paramName
-                  << "' uses unsized (dynamic) unpacked array dimension at "
-                  << fileName << ":" << line << std::endl;
+        SymbolId obj = symbols->registerSymbol(paramName);
+
+        Location loc(fileId, line, column, obj);
+
+        Error err(ErrorDefinition::PARAMETER_DYNAMIC_ARRAY, loc);
+
+        errors->addError(err, false);
       }
     }
   }
