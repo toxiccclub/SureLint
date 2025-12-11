@@ -11,6 +11,7 @@
 #include "fatal_rule.h"
 #include "hierarchical_interface_identifier.h"
 #include "imlicit_data_type.h"
+#include "multiple_dot_star_connection.h"
 #include "parametr_dynamic_array.h"
 #include "parametr_overrride.h"
 #include "prototype_return_data_type.h"
@@ -31,6 +32,7 @@ void runAllRules(const FileContent* fC, ErrorContainer* errors,
   Analyzer::checkCovergroupExpression(fC, errors, symbols);
   Analyzer::checkConcatenationMultiplier(fC, errors, symbols);
   Analyzer::checkParameterOverride(fC, errors, symbols);
+  Analyzer::checkMultipleDotStarConnections(fC, errors, symbols);
 }
 
 void runAllRulesOnDesign(Design* design, const vpiHandle& UHDMdesign,
