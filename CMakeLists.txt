@@ -27,6 +27,7 @@ set(LINTER_SRC
     linter/src/rule_distpatcher.cpp
     linter/src/coverpoint_expression_type.cpp
     linter/src/expression_covergroup.cpp
+    linter/src/concatenation_multiplier.cpp
 )
 
 foreach(f ${LINTER_SRC})

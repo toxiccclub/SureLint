@@ -15,7 +15,7 @@ void checkCoverpointExpressionType(const FileContent* fC,
                                    ErrorContainer* errors,
                                    SymbolTable* symbols);
 
-bool isIntegralType(const FileContent* fC, NodeId node);
+bool isIntegralType(VObjectType type);
 
 std::string getCoverpointName(const FileContent* fC, NodeId cpNode);
 
