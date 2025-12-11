@@ -12,6 +12,7 @@
 #include "hierarchical_interface_identifier.h"
 #include "imlicit_data_type.h"
 #include "parametr_dynamic_array.h"
+#include "parametr_overrride.h"
 #include "prototype_return_data_type.h"
 #include "repet_in_sequence.h"
 
@@ -29,6 +30,7 @@ void runAllRules(const FileContent* fC, ErrorContainer* errors,
   Analyzer::checkCoverpointExpressionType(fC, errors, symbols);
   Analyzer::checkCovergroupExpression(fC, errors, symbols);
   Analyzer::checkConcatenationMultiplier(fC, errors, symbols);
+  Analyzer::checkParameterOverride(fC, errors, symbols);
 }
 
 void runAllRulesOnDesign(Design* design, const vpiHandle& UHDMdesign,
