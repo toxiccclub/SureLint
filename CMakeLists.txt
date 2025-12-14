@@ -16,15 +16,16 @@ add_subdirectory(external/Surelog)
 
 set(LINTER_SRC
     linter/src/lint.cpp
+    linter/src/linter_utils.cpp
     linter/src/class_variable_lifetime.cpp
     linter/src/dpi_decl_string.cpp
     linter/src/fatal_rule.cpp
     linter/src/hierarchical_interface_identifier.cpp
     linter/src/implicit_data_type.cpp
-    linter/src/parametr_dynamic_array.cpp
+    linter/src/parameter_dynamic_array.cpp
     linter/src/prototype_return_data_type.cpp
-    linter/src/repet_in_sequence.cpp
-    linter/src/rule_distpatcher.cpp
+    linter/src/repeat_in_sequence.cpp
+    linter/src/rule_dispatcher.cpp
     linter/src/coverpoint_expression_type.cpp
     linter/src/expression_covergroup.cpp
     linter/src/concatenation_multiplier.cpp

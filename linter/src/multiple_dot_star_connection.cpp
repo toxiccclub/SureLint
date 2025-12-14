@@ -1,14 +1,14 @@
+#include "multiple_dot_star_connection.h"
+
 #include <cstdint>
 #include <string>
 
-#include "Surelog/API/Surelog.h"
-#include "Surelog/CommandLine/CommandLineParser.h"
-#include "Surelog/Common/FileSystem.h"
 #include "Surelog/Design/Design.h"
 #include "Surelog/Design/FileContent.h"
 #include "Surelog/ErrorReporting/ErrorContainer.h"
 #include "Surelog/SourceCompile/SymbolTable.h"
 #include "Surelog/SourceCompile/VObjectTypes.h"
+#include "linter_utils.h"
 
 using namespace SURELOG;
 
@@ -82,32 +82,15 @@ void reportMultipleDotStarError(const FileContent* fC, NodeId badNode,
                                 SymbolTable* symbols) {
   if (!fC || !badNode || !errors || !symbols) return;
 
-  // Получаем имя инстанса
+  // Get instance name
   std::string instanceName = "unknown";
   if (instanceNameNode) {
-    try {
-      instanceName = std::string(fC->SymName(instanceNameNode));
-    } catch (...) {
-      instanceName = "unknown";
-    }
+    instanceName = extractName(fC, instanceNameNode, "unknown");
   }
 
-  auto fileId = fC->getFileId(badNode);
-  uint32_t line = fC->Line(badNode);
-  uint32_t column = 0;
-
-  try {
-    column = fC->Column(badNode);
-  } catch (...) {
-    column = 0;
-  }
-
-  // Используем имя инстанса для сообщения об ошибке
-  SymbolId obj = symbols->registerSymbol(instanceName);
-  Location loc(fileId, line, column, obj);
-
-  Error err(ErrorDefinition::LINT_MULTIPLE_DOT_STAR_CONNECTIONS, loc);
-  errors->addError(err, false);
+  reportError(fC, badNode, instanceName,
+              ErrorDefinition::LINT_MULTIPLE_DOT_STAR_CONNECTIONS, errors,
+              symbols);
 }
 
 void checkMultipleDotStarConnections(const FileContent* fC,

@@ -9,6 +9,9 @@
 
 using namespace SURELOG;
 
-void runAllRules(const FileContent* fC, ErrorContainer* errors, SymbolTable* symbols);
+namespace Analyzer {
 
-void runAllRulesOnDesign(Design* design, const vpiHandle& UHDMdesign, ErrorContainer* errors, SymbolTable* symbols);
+void checkRepetitionInSequence(const FileContent* fC, ErrorContainer* errors,
+                               SymbolTable* symbols);
+
+}  // namespace Analyzer

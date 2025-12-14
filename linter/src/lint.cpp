@@ -2,7 +2,7 @@
 
 #include "Surelog/API/Surelog.h"
 #include "Surelog/CommandLine/CommandLineParser.h"
-#include "rule_distpatcher.h"
+#include "rule_dispatcher.h"
 
 using namespace SURELOG;
 

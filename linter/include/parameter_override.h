@@ -3,7 +3,6 @@
 #include <string>
 
 #include "Surelog/API/Surelog.h"
-#include "Surelog/CommandLine/CommandLineParser.h"
 #include "Surelog/Common/FileSystem.h"
 #include "Surelog/Design/Design.h"
 #include "Surelog/Design/FileContent.h"

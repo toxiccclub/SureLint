@@ -1,35 +1,35 @@
 #include <cstdint>
 #include <string>
 
-#include "Surelog/API/Surelog.h"
-#include "Surelog/CommandLine/CommandLineParser.h"
-#include "Surelog/Common/FileSystem.h"
 #include "Surelog/Design/Design.h"
 #include "Surelog/Design/FileContent.h"
 #include "Surelog/ErrorReporting/ErrorContainer.h"
 #include "Surelog/SourceCompile/SymbolTable.h"
 #include "Surelog/SourceCompile/VObjectTypes.h"
+#include "linter_utils.h"
+#include "parameter_override.h"
 
 using namespace SURELOG;
 
 namespace Analyzer {
 
-bool hasInvalidParameterOverride(const FileContent* fC, NodeId instNode) {
-  if (!fC || !instNode) return false;
+bool isParameterOverrideValid(const FileContent* fC, NodeId instNode) {
+  if (!fC || !instNode) return true;
 
   NodeId child = fC->Child(instNode);
-  if (!child) return false;
+  if (!child) return true;
 
   NodeId secondChild = fC->Sibling(child);
-  if (!secondChild) return false;
+  if (!secondChild) return true;
 
   VObjectType secondType = fC->Type(secondChild);
 
+  // Invalid if second child is a constant or literal
   if (secondType == VObjectType::slIntConst ||
       secondType == VObjectType::slRealConst ||
       secondType == VObjectType::slStringConst ||
       secondType == VObjectType::ppNumber) {
-    return true;
+    return false;
   }
 
   if (secondType == VObjectType::paConstant_expression ||
@@ -40,38 +40,22 @@ bool hasInvalidParameterOverride(const FileContent* fC, NodeId instNode) {
       VObjectType thirdType = fC->Type(thirdChild);
       if (thirdType == VObjectType::paHierarchical_instance ||
           thirdType == VObjectType::paName_of_instance) {
-        return true;
+        return false;
       }
     }
   }
 
-  return false;
+  return true;
 }
 
-void reportError(const FileContent* fC, NodeId badNode, ErrorContainer* errors,
-                 SymbolTable* symbols) {
+void reportParameterOverrideError(const FileContent* fC, NodeId badNode,
+                                  ErrorContainer* errors,
+                                  SymbolTable* symbols) {
   if (!fC || !badNode || !errors || !symbols) return;
 
-  std::string tokenName = "<unknown>";
-  try {
-    tokenName = std::string(fC->SymName(badNode));
-  } catch (...) {
-  }
-
-  auto fileId = fC->getFileId(badNode);
-  uint32_t line = fC->Line(badNode);
-  uint32_t column = 0;
-  try {
-    column = fC->Column(badNode);
-  } catch (...) {
-    column = 0;
-  }
-
-  SymbolId obj = symbols->registerSymbol(tokenName);
-  Location loc(fileId, line, column, obj);
-  Error err(ErrorDefinition::LINT_PARAMETR_OVERRIDE, loc);
-
-  errors->addError(err, false);
+  std::string tokenName = extractName(fC, badNode);
+  reportError(fC, badNode, tokenName, ErrorDefinition::LINT_PARAMETR_OVERRIDE,
+              errors, symbols);
 }
 
 void checkParameterOverride(const FileContent* fC, ErrorContainer* errors,
@@ -88,14 +72,14 @@ void checkParameterOverride(const FileContent* fC, ErrorContainer* errors,
   for (NodeId inst : instantiations) {
     if (!inst) continue;
 
-    if (hasInvalidParameterOverride(fC, inst)) {
+    if (!isParameterOverrideValid(fC, inst)) {
       // Находим узел с некорректным значением
       NodeId moduleName = fC->Child(inst);
       NodeId badNode = fC->Sibling(moduleName);
 
       if (!badNode) badNode = inst;
 
-      reportError(fC, badNode, errors, symbols);
+      reportParameterOverrideError(fC, badNode, errors, symbols);
     }
   }
 }

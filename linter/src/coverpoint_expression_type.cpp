@@ -1,26 +1,21 @@
+#include "coverpoint_expression_type.h"
+
 #include <cstdint>
 #include <string>
 
-#include "Surelog/API/Surelog.h"
-#include "Surelog/CommandLine/CommandLineParser.h"
-#include "Surelog/Common/FileSystem.h"
 #include "Surelog/Design/Design.h"
 #include "Surelog/Design/FileContent.h"
 #include "Surelog/ErrorReporting/ErrorContainer.h"
 #include "Surelog/SourceCompile/SymbolTable.h"
 #include "Surelog/SourceCompile/VObjectTypes.h"
+#include "linter_utils.h"
 
 using namespace SURELOG;
 
 namespace Analyzer {
 
 std::string getCoverpointName(const FileContent* fC, NodeId cpNode) {
-  for (NodeId node = fC->Child(cpNode); node; node = fC->Sibling(node)) {
-    if (fC->Type(node) == VObjectType::slStringConst) {
-      return std::string(fC->SymName(node));
-    }
-  }
-  return "<unknown>";
+  return extractName(fC, cpNode);
 }
 
 bool isIntegralType(VObjectType type) {
@@ -118,20 +113,9 @@ void checkSingleCoverpoint(const FileContent* fC, NodeId cpId,
 
   if (!isIntegralType(varType)) {
     std::string cpName = getCoverpointName(fC, cpId);
-
-    auto fileId = fC->getFileId(cpId);
-    uint32_t line = fC->Line(cpId);
-    uint32_t column = 0;
-    try {
-      column = fC->Column(cpId);
-    } catch (...) {
-      column = 0;
-    }
-
-    SymbolId obj = symbols->registerSymbol(cpName);
-    Location loc(fileId, line, column, obj);
-    Error err(ErrorDefinition::LINT_COVERPOINT_EXPRESSION_TYPE, loc);
-    errors->addError(err, false);
+    reportError(fC, cpId, cpName,
+                ErrorDefinition::LINT_COVERPOINT_EXPRESSION_TYPE, errors,
+                symbols);
   }
 }
 

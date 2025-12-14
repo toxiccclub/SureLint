@@ -1,3 +1,4 @@
+#pragma once
 
 #include <string>
 
@@ -8,9 +9,6 @@
 
 using namespace SURELOG;
 
-namespace Analyzer {
+void runAllRules(const FileContent* fC, ErrorContainer* errors, SymbolTable* symbols);
 
-void checkRepetitionInSequence(const FileContent* fC, ErrorContainer* errors,
-                               SymbolTable* symbols);
-
-}
+void runAllRulesOnDesign(Design* design, const vpiHandle& UHDMdesign, ErrorContainer* errors, SymbolTable* symbols);

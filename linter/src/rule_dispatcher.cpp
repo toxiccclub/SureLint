@@ -1,3 +1,5 @@
+#include "rule_dispatcher.h"
+
 #include <iostream>
 
 #include "Surelog/Common/FileSystem.h"
@@ -10,12 +12,12 @@
 #include "dpi_decl_string.h"
 #include "fatal_rule.h"
 #include "hierarchical_interface_identifier.h"
-#include "imlicit_data_type.h"
+#include "implicit_data_type.h"
 #include "multiple_dot_star_connection.h"
-#include "parametr_dynamic_array.h"
-#include "parametr_overrride.h"
+#include "parameter_dynamic_array.h"
+#include "parameter_override.h"
 #include "prototype_return_data_type.h"
-#include "repet_in_sequence.h"
+#include "repeat_in_sequence.h"
 
 using namespace SURELOG;
 

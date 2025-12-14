@@ -1,16 +1,14 @@
 #include <cstdint>
-#include <iostream>
 #include <set>
 #include <string>
 
-#include "Surelog/API/Surelog.h"
-#include "Surelog/CommandLine/CommandLineParser.h"
-#include "Surelog/Common/FileSystem.h"
 #include "Surelog/Design/Design.h"
 #include "Surelog/Design/FileContent.h"
 #include "Surelog/ErrorReporting/ErrorContainer.h"
 #include "Surelog/SourceCompile/SymbolTable.h"
 #include "Surelog/SourceCompile/VObjectTypes.h"
+#include "covergroup_expression.h"
+#include "linter_utils.h"
 
 using namespace SURELOG;
 
@@ -84,18 +82,9 @@ void checkIdentifiersRecursive(const FileContent* fC, NodeId node,
 
     if (moduleVars.count(varName) > 0) {
       if (allowedArgs.count(varName) == 0) {
-        auto fileId = fC->getFileId(node);
-        uint32_t line = fC->Line(node);
-        uint32_t column = 0;
-        try {
-          column = fC->Column(node);
-        } catch (...) {
-        }
-
-        SymbolId obj = symbols->registerSymbol(varName);
-        Location loc(fileId, line, column, obj);
-        Error err(ErrorDefinition::LINT_COVERGROUP_EXPRESSION, loc);
-        errors->addError(err, false);
+        reportError(fC, node, varName,
+                    ErrorDefinition::LINT_COVERGROUP_EXPRESSION, errors,
+                    symbols);
         return;
       }
     }

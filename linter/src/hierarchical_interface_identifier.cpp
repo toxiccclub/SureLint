@@ -1,32 +1,30 @@
-#include <cstdint>
-#include <iostream>
-#include <string>
+#include "hierarchical_interface_identifier.h"
 
-#include "Surelog/API/Surelog.h"
-#include "Surelog/CommandLine/CommandLineParser.h"
-#include "Surelog/Common/FileSystem.h"
+#include <cstdint>
+#include <string>
+#include <vector>
+
 #include "Surelog/Design/Design.h"
 #include "Surelog/Design/FileContent.h"
 #include "Surelog/ErrorReporting/ErrorContainer.h"
 #include "Surelog/SourceCompile/SymbolTable.h"
 #include "Surelog/SourceCompile/VObjectTypes.h"
+#include "linter_utils.h"
 
 using namespace SURELOG;
 
 namespace Analyzer {
 
-// Вспомогательная функция: получить все StringConst внутри заданного узла
+// получить все StringConst внутри заданного узла
 static std::vector<NodeId> collectStringConsts(const FileContent* fC,
                                                NodeId node) {
   std::vector<NodeId> out;
-  // sl_collect_all возвращает все дочерние узлы запрошенного типа
   auto stringNodes = fC->sl_collect_all(node, VObjectType::slStringConst);
   for (NodeId s : stringNodes) out.push_back(s);
   return out;
 }
 
-// Вспомогательная: получить "склеенное" имя из списка StringConst (например
-// "top.id2.id3")
+// получить «объединенное» имя из списка StringConst (например, «top.id2.id3»)
 static std::string joinNames(const FileContent* fC,
                              const std::vector<NodeId>& parts) {
   if (parts.empty()) return "<unknown>";
@@ -49,26 +47,12 @@ void checkHierarchicalInterfaceIdentifier(const FileContent* fC,
   for (NodeId iid : iidNodes) {
     auto parts = collectStringConsts(fC, iid);
 
-    // Если частей >= 1 — это иерархическое имя → нарушение
-    if (parts.size() >= 1) {
+    // Если частей > 1 — это иерархическое имя → нарушение
+    if (parts.size() > 1) {
       std::string fullName = joinNames(fC, parts);
-
-      auto fileId = fC->getFileId(iid);
-      uint32_t line = fC->Line(iid);
-      uint32_t column = 0;
-      try {
-        column = fC->Column(iid);
-      } catch (...) {
-        column = 0;
-      }
-
-      SymbolId obj = symbols->registerSymbol(fullName);
-
-      Location loc(fileId, line, column, obj);
-
-      Error err(ErrorDefinition::LINT_HIERARCHICAL_INTERFACE_IDENTIFIER, loc);
-
-      errors->addError(err, false);
+      reportError(fC, iid, fullName,
+                  ErrorDefinition::LINT_HIERARCHICAL_INTERFACE_IDENTIFIER,
+                  errors, symbols);
     }
   }
 }

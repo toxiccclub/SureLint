@@ -1,28 +1,22 @@
+#include "prototype_return_data_type.h"
+
 #include <cstdint>
-#include <iostream>
 #include <string>
 
-#include "Surelog/API/Surelog.h"
-#include "Surelog/CommandLine/CommandLineParser.h"
-#include "Surelog/Common/FileSystem.h"
 #include "Surelog/Design/Design.h"
 #include "Surelog/Design/FileContent.h"
 #include "Surelog/ErrorReporting/ErrorContainer.h"
 #include "Surelog/SourceCompile/SymbolTable.h"
 #include "Surelog/SourceCompile/VObjectTypes.h"
+#include "linter_utils.h"
 
 using namespace SURELOG;
 
 namespace Analyzer {
 
-// Получение имени функции из Function_data_type_or_implicit
+// Get function name from Function_data_type_or_implicit
 std::string getFunctionName(const FileContent* fC, NodeId typeNode) {
-  for (NodeId node = typeNode; node; node = fC->Sibling(node)) {
-    if (fC->Type(node) == VObjectType::slStringConst) {
-      return std::string(fC->SymName(node));
-    }
-  }
-  return "<unknown>";
+  return extractName(fC, typeNode);
 }
 
 // Проверка наличия return type
@@ -46,21 +40,9 @@ void checkFunctionPrototype(const FileContent* fC, NodeId protoId,
 
   if (!hasReturnType(fC, typeNode)) {
     std::string funcName = getFunctionName(fC, typeNode);
-    auto fileId = fC->getFileId(typeNode);
-    uint32_t line = fC->Line(typeNode);
-    uint32_t column = 0;
-    try {
-      column = fC->Column(typeNode);
-    } catch (...) {
-      column = 0;
-    }
-
-    SymbolId obj = symbols->registerSymbol(funcName);
-
-    Location loc(fileId, line, column, obj);
-    Error err(ErrorDefinition::LINT_PROTOTYPE_RETURN_DATA_TYPE, loc);
-
-    errors->addError(err, false);
+    reportError(fC, typeNode, funcName,
+                ErrorDefinition::LINT_PROTOTYPE_RETURN_DATA_TYPE, errors,
+                symbols);
   }
 }
 

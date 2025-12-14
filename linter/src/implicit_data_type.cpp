@@ -1,34 +1,22 @@
+#include "implicit_data_type.h"
+
 #include <cstdint>
-#include <iostream>
 #include <string>
 
-#include "Surelog/API/Surelog.h"
-#include "Surelog/CommandLine/CommandLineParser.h"
-#include "Surelog/Common/FileSystem.h"
 #include "Surelog/Design/Design.h"
 #include "Surelog/Design/FileContent.h"
 #include "Surelog/ErrorReporting/ErrorContainer.h"
 #include "Surelog/SourceCompile/SymbolTable.h"
 #include "Surelog/SourceCompile/VObjectTypes.h"
+#include "linter_utils.h"
 
 using namespace SURELOG;
 
 namespace Analyzer {
 
-// Извлекаем имя переменной из Variable_decl_assignment
+// Extract variable name from Variable_decl_assignment
 std::string findVarName(const FileContent* fC, NodeId dataDecl) {
-  auto lists = fC->sl_collect_all(
-      dataDecl, VObjectType::paList_of_variable_decl_assignments);
-  for (NodeId list : lists) {
-    auto assigns =
-        fC->sl_collect_all(list, VObjectType::paVariable_decl_assignment);
-    for (NodeId assign : assigns) {
-      NodeId child = fC->Child(assign);
-      if (child && fC->Type(child) == VObjectType::slStringConst)
-        return std::string(fC->SymName(child));
-    }
-  }
-  return "<unknown>";
+  return extractVariableName(fC, dataDecl);
 }
 
 // Проверка наличия явного типа
@@ -60,26 +48,12 @@ void checkImplicitDataTypeInDeclaration(const FileContent* fC,
 
     if (hasExplicitType(fC, dataDecl)) continue;
 
-    // Ошибка IMPLICIT_DATA_TYPE_IN_DECLARATION
+    // Error: IMPLICIT_DATA_TYPE_IN_DECLARATION
     std::string varName = findVarName(fC, dataDecl);
-
     NodeId where = packedDims.front();
-    auto fileId = fC->getFileId(where);
-    uint32_t line = fC->Line(where);
-    uint32_t column = 0;
-    try {
-      column = fC->Column(where);
-    } catch (...) {
-      column = 0;
-    }
 
-    SymbolId obj = symbols->registerSymbol(varName);
-
-    Location loc(fileId, line, column, obj);
-
-    Error err(ErrorDefinition::LINT_IMPLICIT_DATA_TYPE, loc);
-
-    errors->addError(err, false);
+    reportError(fC, where, varName, ErrorDefinition::LINT_IMPLICIT_DATA_TYPE,
+                errors, symbols);
   }
 }
 }  // namespace Analyzer

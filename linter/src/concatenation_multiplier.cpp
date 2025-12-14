@@ -1,15 +1,15 @@
+#include "concatenation_multiplier.h"
+
 #include <map>
 #include <set>
 #include <string>
 
-#include "Surelog/API/Surelog.h"
-#include "Surelog/CommandLine/CommandLineParser.h"
-#include "Surelog/Common/FileSystem.h"
 #include "Surelog/Design/Design.h"
 #include "Surelog/Design/FileContent.h"
 #include "Surelog/ErrorReporting/ErrorContainer.h"
 #include "Surelog/SourceCompile/SymbolTable.h"
 #include "Surelog/SourceCompile/VObjectTypes.h"
+#include "linter_utils.h"
 
 using namespace SURELOG;
 
@@ -228,19 +228,9 @@ void checkSingleMultipleConcatenation(
   std::string nonConstantVar;
   if (!isConstantExpression(fC, multiplierExpr, constantParams, variables,
                             &nonConstantVar)) {
-    auto fileId = fC->getFileId(multiplierExpr);
-    uint32_t line = fC->Line(multiplierExpr);
-    uint32_t column = 0;
-
-    try {
-      column = fC->Column(multiplierExpr);
-    } catch (...) {
-    }
-
-    SymbolId obj = symbols->registerSymbol(nonConstantVar);
-    Location loc(fileId, line, column, obj);
-    Error err(ErrorDefinition::LINT_CONCATENATION_MULTIPLIER, loc);
-    errors->addError(err, false);
+    reportError(fC, multiplierExpr, nonConstantVar,
+                ErrorDefinition::LINT_CONCATENATION_MULTIPLIER, errors,
+                symbols);
   }
 }
 
