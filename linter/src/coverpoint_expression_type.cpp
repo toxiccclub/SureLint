@@ -98,7 +98,6 @@ void checkSingleCoverpoint(const FileContent* fC, NodeId cpId,
                            ErrorContainer* errors, SymbolTable* symbols) {
   NodeId exprNode;
 
-  // Находим выражение внутри coverpoint
   for (NodeId child = fC->Child(cpId); child; child = fC->Sibling(child)) {
     if (fC->Type(child) == VObjectType::paPrimary ||
         fC->Type(child) == VObjectType::paExpression) {

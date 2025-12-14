@@ -40,7 +40,6 @@ void checkDpiDeclarationString(const FileContent* fC, ErrorContainer* errors,
 
     dpiStr = trim(dpiStr);
 
-    // Check value
     if (dpiStr != "DPI-C" && dpiStr != "DPI") {
       reportError(fC, stringNode, dpiStr,
                   ErrorDefinition::LINT_DPI_DECLARATION_STRING, errors,

@@ -14,8 +14,8 @@ using namespace SURELOG;
 
 namespace Analyzer {
 
-// Inside one Sequence_expr there should not be both
-// paGoto_repetition and paNon_consecutive_repetition
+// Внутри одного Sequence_expr не должно быть одновременно
+// paGoto_repetition и paNon_consecutive_repetition
 void checkRepetitionInSequence(const FileContent* fC, ErrorContainer* errors,
                                SymbolTable* symbols) {
   if (!fC) return;
@@ -23,18 +23,14 @@ void checkRepetitionInSequence(const FileContent* fC, ErrorContainer* errors,
   NodeId root = fC->getRootNode();
   if (!root) return;
 
-  // Find all Sequence_declaration
   auto seqDecls = fC->sl_collect_all(root, VObjectType::paSequence_declaration);
 
   for (NodeId seqDeclId : seqDecls) {
-    // Sequence name (if available)
     std::string seqName = extractName(fC, seqDeclId);
 
-    // Find all Sequence_expr in this sequence_declaration
     auto seqExprs = fC->sl_collect_all(seqDeclId, VObjectType::paSequence_expr);
 
     for (NodeId seqExprId : seqExprs) {
-      // Find different types of repetitions inside seqExpr
       auto gotoNodes =
           fC->sl_collect_all(seqExprId, VObjectType::paGoto_repetition);
       auto nonConsecNodes = fC->sl_collect_all(

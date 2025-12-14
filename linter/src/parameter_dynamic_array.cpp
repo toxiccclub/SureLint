@@ -22,7 +22,7 @@ void checkParameterDynamicArray(const FileContent* fC, ErrorContainer* errors,
                                 SymbolTable* symbols) {
   NodeId root = fC->getRootNode();
 
-  // Parameter declaration types
+  // Типы объявления параметров
   std::vector<VObjectType> declTypes = {
       VObjectType::paParameter_declaration,
       VObjectType::paLocal_parameter_declaration};

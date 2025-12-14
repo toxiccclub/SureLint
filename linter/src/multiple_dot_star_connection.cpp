@@ -82,7 +82,7 @@ void reportMultipleDotStarError(const FileContent* fC, NodeId badNode,
                                 SymbolTable* symbols) {
   if (!fC || !badNode || !errors || !symbols) return;
 
-  // Get instance name
+  // Получить имя экземпляра
   std::string instanceName = "unknown";
   if (instanceNameNode) {
     instanceName = extractName(fC, instanceNameNode, "unknown");

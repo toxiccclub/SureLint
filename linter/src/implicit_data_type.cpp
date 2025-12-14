@@ -14,7 +14,7 @@ using namespace SURELOG;
 
 namespace Analyzer {
 
-// Extract variable name from Variable_decl_assignment
+// Извлечь имя переменной из Variable_decl_assignment
 std::string findVarName(const FileContent* fC, NodeId dataDecl) {
   return extractVariableName(fC, dataDecl);
 }

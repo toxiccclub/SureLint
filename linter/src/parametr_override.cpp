@@ -24,7 +24,7 @@ bool isParameterOverrideValid(const FileContent* fC, NodeId instNode) {
 
   VObjectType secondType = fC->Type(secondChild);
 
-  // Invalid if second child is a constant or literal
+  // Недопустимо, если второй дочерний элемент является константой или литералом
   if (secondType == VObjectType::slIntConst ||
       secondType == VObjectType::slRealConst ||
       secondType == VObjectType::slStringConst ||

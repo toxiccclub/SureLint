@@ -14,7 +14,7 @@ using namespace SURELOG;
 
 namespace Analyzer {
 
-// Get function name from Function_data_type_or_implicit
+// Получить имя функции из Function_data_type_or_implicit
 std::string getFunctionName(const FileContent* fC, NodeId typeNode) {
   return extractName(fC, typeNode);
 }
