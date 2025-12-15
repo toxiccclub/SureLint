@@ -5,7 +5,7 @@
 
 ---
 
-**Реализованные проверки**
+## Реализованные проверки
 
 - FATAL_SYSTEM_TASK_FIRST_ARGUMENT
 - CLASS_VARIABLE_LIFETIME
