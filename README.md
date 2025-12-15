@@ -5,6 +5,21 @@
 
 ---
 
+**Реализованные проверки**
+-FATAL_SYSTEM_TASK_FIRST_ARGUMENT
+-CLASS_VARIABLE_LIFETIME
+-IMPLICIT_DATA_TYPE_IN_DECLARATION
+-PARAMETER_DYNAMIC_ARRAY
+-HIERARCHICAL_INTERFACE_IDENTIFIER
+-PROTOTYPE_RETURN_DATA_TYPE
+-DPI_DECLARATION_STRING
+-REPETITION_IN_SEQUENCE
+-COVERPOINT_EXPRESSION_TYPE
+-COVERGROUP_EXPRESSION
+-CONCATENATION_MULTIPLIER
+-PARAMETER_OVERRIDE
+-MULTIPLE_DOT_STAR_CONNECTIONS
+
 ## Структура проекта
 
 - `linter/src` – Реализация правил линтера (на данный момент реализовано 8 правил).  
@@ -24,22 +39,30 @@ cd Linter_Surelog
 
 # Инициализация submodule Surelog
 git submodule update --init --recursive
-
-# Сборка проекта
-make
 ```
 
+### Сборка через консоль
+```bash
+mkdir build && cd build
+
+make
+```
 После сборки бинарник `lint` появится в папке `bin`.
 
+### Docker
+```bash
+docker build -t my-linter
+```
 ---
 
 ## Использование
 
 Для проверки SystemVerilog файлов используйте команду:
 
+### Запуск через консоль
 ```bash
-./bin/lint /путь/к/файлу/my_sv_code.sv -nobuiltin
+./bin/lint /path/to/your_file/my_sv_code.sv -nobuiltin
 ```
-
-Пояснения к аргументам:
-- `/путь/к/файлу/my_sv_code.sv` – путь к файлу или директории с файлами, которые нужно проверить.   
+### Запуск через docker
+```bash
+docker run --rm -v /path/to/your/project:/data my-linter lint /data/my_sv_code.sv -nobuiltin
