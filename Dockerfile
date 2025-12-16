@@ -2,7 +2,6 @@ FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Устаналиваем зависимости
 RUN apt-get update && apt-get install -y \
     build-essential \
     cmake \
@@ -10,18 +9,18 @@ RUN apt-get update && apt-get install -y \
     default-jre \
     python3 \
     python3-pip \
-    && rm -rf /var/lib/apt/lists/*
-
-# Устанавливаем python зависимости
-RUN pip3 install orderedmultidict
+    && rm -rf /var/lib/apt/lists/* \
+    && pip install orderedmultidict
 
 WORKDIR /app
 
-# Копирование и сборка
-COPY . .
+COPY CMakeLists.txt Makefile /app/
+COPY linter /app/linter
+COPY external /app/external
+
 RUN rm -rf build dbuild coverage-build
 RUN make release
 
 ENV PATH="/app/build/bin:${PATH}"
 
-CMD ["lint", "--help"
+CMD ["lint", "--help"]
