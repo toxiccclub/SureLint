@@ -36,7 +36,7 @@ The project is intended for static code analysis and checking compliance with co
 Clone the repository and initialize the Surelog submodule:
 
 ```bash
-git clone https://github.com/toxiccclub/Linter_Surelog.git
+git clone https://github.com/toxiccclub/SureLint.git
 cd Linter_Surelog
 
 git submodule update --init --recursive
