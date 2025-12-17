@@ -70,10 +70,3 @@ After a successful build, the `lint` binary will be located in the `build/bin` d
 ```bash
 ./build/bin/lint /path/to/your_file/my_sv_code.sv -nobuiltin
 ```
-
-### Run via locally built Docker image
-
-```bash
-cd /path/to/sv/files
-docker run --rm -v "$(pwd)":/data -w /data my-linter lint file.sv -nobuiltin
-```
