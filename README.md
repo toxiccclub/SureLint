@@ -31,7 +31,20 @@ The project is intended for static code analysis and checking compliance with co
 
 ---
 
-## Building the project
+## Usage
+
+### Recommended: via prebuilt Docker image
+
+You can use the prebuilt image published to GitHub Container Registry:
+
+```bash
+cd /path/to/sv/file.sv
+docker run --rm -v "$(pwd)":/data -w /data ghcr.io/toxiccclub/surelint:latest lint file.sv -nobuiltin
+```
+
+---
+
+## Build and run locally
 
 Clone the repository and initialize the Surelog submodule:
 
@@ -52,23 +65,13 @@ make release
 
 After a successful build, the `lint` binary will be located in the `build/bin` directory.
 
-### Docker
-
-```bash
-docker build -t my-linter .
-```
-
----
-
-## Usage
-
-### Run from console
+### Run from console (local build)
 
 ```bash
 ./build/bin/lint /path/to/your_file/my_sv_code.sv -nobuiltin
 ```
 
-### Run via Docker
+### Run via locally built Docker image
 
 ```bash
 cd /path/to/sv/files
