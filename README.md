@@ -46,7 +46,9 @@ docker run --rm -v "$(pwd)":/data -w /data ghcr.io/toxiccclub/surelint:latest li
 
 ## Build and run locally
 
-Clone the repository and initialize the Surelog submodule:
+### 1. Clone the repository and initialize submodules
+
+Clone the repository and fetch the bundled Surelog submodule:
 
 ```bash
 git clone https://github.com/toxiccclub/SureLint.git
@@ -55,18 +57,32 @@ cd Linter_Surelog
 git submodule update --init --recursive
 ```
 
-### Build from source
+### 2. Build from source
 
-The project uses CMake via the top-level `Makefile`. To build the release binary, run:
+The project uses CMake driven by the top-level `Makefile`.  
+You will need a C++17-capable compiler, CMake, and `make` installed.
+
+To build the **release** binary, run:
 
 ```bash
 make release
 ```
 
-After a successful build, the `lint` binary will be located in the `build/bin` directory.
+This will configure and build the project into the `build` directory.
 
-### Run from console (local build)
+After a successful build, the `lint` binary will be located at:
+
+```bash
+ls build/bin
+```
+
+You should see `lint` among the listed files.
+
+
+### 3. Run from console (local build)
 
 ```bash
 ./build/bin/lint /path/to/your_file/my_sv_code.sv -nobuiltin
 ```
+
+You can run `./build/bin/lint --help` to see all available options.
