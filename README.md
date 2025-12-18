@@ -52,7 +52,7 @@ Clone the repository and fetch the bundled Surelog submodule:
 
 ```bash
 git clone https://github.com/toxiccclub/SureLint.git
-cd Linter_Surelog
+cd SureLint
 
 git submodule update --init --recursive
 ```
