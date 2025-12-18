@@ -7,19 +7,44 @@ The project is intended for static code analysis and checking compliance with co
 
 ## Implemented rules
 
-- `FATAL_SYSTEM_TASK_FIRST_ARGUMENT`
-- `CLASS_VARIABLE_LIFETIME`
-- `IMPLICIT_DATA_TYPE_IN_DECLARATION`
-- `PARAMETER_DYNAMIC_ARRAY`
-- `HIERARCHICAL_INTERFACE_IDENTIFIER`
-- `PROTOTYPE_RETURN_DATA_TYPE`
-- `DPI_DECLARATION_STRING`
-- `REPETITION_IN_SEQUENCE`
-- `COVERPOINT_EXPRESSION_TYPE`
-- `COVERGROUP_EXPRESSION`
-- `CONCATENATION_MULTIPLIER`
-- `PARAMETER_OVERRIDE`
-- `MULTIPLE_DOT_STAR_CONNECTIONS`
+- `FATAL_SYSTEM_TASK_FIRST_ARGUMENT`  
+  Expecting 0, 1 or 2 as first argument to '$fatal' system task
+
+- `CLASS_VARIABLE_LIFETIME`  
+  'automatic' lifetime for class variable not allowed
+
+- `IMPLICIT_DATA_TYPE_IN_DECLARATION`  
+  Expecting net type (e.g. wire) or 'var' keyword before implicit data type
+
+- `PARAMETER_DYNAMIC_ARRAY`  
+  Fixed size required for parameter dimension
+
+- `HIERARCHICAL_INTERFACE_IDENTIFIER`  
+  Hierarchical interface identifier not allowed
+
+- `PROTOTYPE_RETURN_DATA_TYPE`  
+  Expecting return data type or void for function prototype
+
+- `DPI_DECLARATION_STRING`  
+  Expecting "DPI" or "DPI-C"
+
+- `REPETITION_IN_SEQUENCE`  
+  Goto repeat '[->' and non-consecutive repeat '[=' operators not allowed
+
+- `COVERPOINT_EXPRESSION_TYPE`  
+  Coverpoint expression should be of an integral data type
+
+- `COVERGROUP_EXPRESSION`  
+  Expecting constant expression or non-ref covergroup argument
+
+- `CONCATENATION_MULTIPLIER`  
+  Expecting constant expression as concatenation multiplier
+
+- `PARAMETER_OVERRIDE`  
+  Expecting parentheses around parameter override
+
+- `MULTIPLE_DOT_STAR_CONNECTIONS`  
+  Dot start port connection '.*' cannot appear more than once in the port list
 
 ---
 
@@ -37,9 +62,58 @@ The project is intended for static code analysis and checking compliance with co
 
 You can use the prebuilt image published to GitHub Container Registry:
 
+#### Single file
+
 ```bash
 cd /path/to/sv/file.sv
 docker run --rm -v "$(pwd)":/data -w /data ghcr.io/toxiccclub/surelint:latest lint file.sv -nobuiltin
+```
+
+#### Using filelist (.f)
+
+The recommended way to lint entire projects is using a filelist.
+
+Example `files.f`:
+
+```
++incdir+rtl/include
++define+SYNTHESIS
+rtl/pkg/common_pkg.sv
+rtl/interfaces/bus_if.sv
+rtl/core/top.sv
+rtl/core/alu.sv
+rtl/core/regfile.sv
+```
+
+Run with Docker:
+
+```bash
+cd /path/to/project
+docker run --rm -v "$(pwd)":/data -w /data ghcr.io/toxiccclub/surelint:latest lint -f files.f -nobuiltin
+```
+
+The filelist format supports:
+- Include directories: `+incdir+<path>`
+- Defines: `+define+<name>` or `+define+<name>=<value>`
+- File paths: relative or absolute paths to SystemVerilog files
+
+#### Alternative: Multiple files or wildcards
+
+You can also pass multiple files or use wildcards:
+
+```bash
+# Multiple files
+cd /path/to/project
+docker run --rm -v "$(pwd)":/data -w /data ghcr.io/toxiccclub/surelint:latest lint file1.sv file2.sv file3.sv -nobuiltin
+
+# All .sv files in current directory
+docker run --rm -v "$(pwd)":/data -w /data ghcr.io/toxiccclub/surelint:latest lint *.sv -nobuiltin
+
+# All .sv files recursively
+docker run --rm -v "$(pwd)":/data -w /data ghcr.io/toxiccclub/surelint:latest lint **/*.sv -nobuiltin
+
+# Specific directory
+docker run --rm -v "$(pwd)":/data -w /data ghcr.io/toxiccclub/surelint:latest lint /path/to/project/**/*.sv -nobuiltin
 ```
 
 ---
@@ -81,8 +155,52 @@ You should see `lint` among the listed files.
 
 ### 3. Run from console (local build)
 
+#### Single file
+
+To lint a single SystemVerilog file:
+
 ```bash
 ./build/bin/lint /path/to/your_file/my_sv_code.sv -nobuiltin
+```
+
+#### Using filelist (.f)
+
+The recommended way to lint entire projects is using a filelist:
+
+Example `files.f`:
+
+```
++incdir+rtl/include
++define+SYNTHESIS
+rtl/pkg/common_pkg.sv
+rtl/interfaces/bus_if.sv
+rtl/core/top.sv
+rtl/core/alu.sv
+rtl/core/regfile.sv
+```
+
+Run with filelist:
+
+```bash
+./build/bin/lint -f files.f -nobuiltin
+```
+
+#### Alternative: Multiple files or wildcards
+
+You can also pass multiple files or use wildcards:
+
+```bash
+# Multiple files
+./build/bin/lint file1.sv file2.sv file3.sv -nobuiltin
+
+# All .sv files in current directory
+./build/bin/lint *.sv -nobuiltin
+
+# All .sv files recursively
+./build/bin/lint **/*.sv -nobuiltin
+
+# Specific directory
+./build/bin/lint /path/to/project/**/*.sv -nobuiltin
 ```
 
 You can run `./build/bin/lint --help` to see all available options.
