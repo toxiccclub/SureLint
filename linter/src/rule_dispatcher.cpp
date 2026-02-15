@@ -18,6 +18,7 @@
 #include "parameter_override.h"
 #include "prototype_return_data_type.h"
 #include "repeat_in_sequence.h"
+#include "select_in_event_control.h"
 
 using namespace SURELOG;
 
@@ -35,6 +36,7 @@ void runAllRules(const FileContent* fC, ErrorContainer* errors,
   Analyzer::checkConcatenationMultiplier(fC, errors, symbols);
   Analyzer::checkParameterOverride(fC, errors, symbols);
   Analyzer::checkMultipleDotStarConnections(fC, errors, symbols);
+  Analyzer::checkSelectInEventControl(fC, errors, symbols);
 }
 
 void runAllRulesOnDesign(Design* design, const vpiHandle& UHDMdesign,

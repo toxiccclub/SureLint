@@ -31,6 +31,7 @@ set(LINTER_SRC
     linter/src/concatenation_multiplier.cpp
     linter/src/parametr_override.cpp
     linter/src/multiple_dot_star_connection.cpp
+    linter/src/select_in_event_control.cpp
 )
 
 foreach(f ${LINTER_SRC})

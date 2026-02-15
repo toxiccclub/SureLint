@@ -17,7 +17,7 @@ int main(int argc, const char** argv) {
   clp->setElaborate(true);
   clp->setwritePpOutput(true);
   clp->setCacheAllowed(false);
-  clp->setFilterInfo();
+  // clp->setFilterInfo();
   clp->setFilterNote();
   clp->setFilterWarning();
 
