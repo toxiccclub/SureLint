@@ -10,6 +10,7 @@
 #include "covergroup_expression.h"
 #include "coverpoint_expression_type.h"
 #include "dpi_decl_string.h"
+#include "empty_assignment_pattern.h"
 #include "fatal_rule.h"
 #include "hierarchical_interface_identifier.h"
 #include "implicit_data_type.h"
@@ -37,6 +38,7 @@ void runAllRules(const FileContent* fC, ErrorContainer* errors,
   Analyzer::checkParameterOverride(fC, errors, symbols);
   Analyzer::checkMultipleDotStarConnections(fC, errors, symbols);
   Analyzer::checkSelectInEventControl(fC, errors, symbols);
+  Analyzer::checkEmptyAssignmentPattern(fC, errors, symbols);
 }
 
 void runAllRulesOnDesign(Design* design, const vpiHandle& UHDMdesign,
