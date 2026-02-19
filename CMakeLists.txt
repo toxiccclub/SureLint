@@ -33,6 +33,7 @@ set(LINTER_SRC
     linter/src/multiple_dot_star_connection.cpp
     linter/src/select_in_event_control.cpp
     linter/src/empty_assignment_pattern.cpp
+    linter/src/missing_for_loop_initialization.cpp
 )
 
 foreach(f ${LINTER_SRC})

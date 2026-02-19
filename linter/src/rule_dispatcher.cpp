@@ -14,6 +14,7 @@
 #include "fatal_rule.h"
 #include "hierarchical_interface_identifier.h"
 #include "implicit_data_type.h"
+#include "missing_for_loop_initialization.h"
 #include "multiple_dot_star_connection.h"
 #include "parameter_dynamic_array.h"
 #include "parameter_override.h"
@@ -39,6 +40,7 @@ void runAllRules(const FileContent* fC, ErrorContainer* errors,
   Analyzer::checkMultipleDotStarConnections(fC, errors, symbols);
   Analyzer::checkSelectInEventControl(fC, errors, symbols);
   Analyzer::checkEmptyAssignmentPattern(fC, errors, symbols);
+  Analyzer::checkMissingForLoopInitialization(fC, errors, symbols);
 }
 
 void runAllRulesOnDesign(Design* design, const vpiHandle& UHDMdesign,
