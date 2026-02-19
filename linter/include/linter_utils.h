@@ -31,6 +31,10 @@ void reportError(const FileContent* fC, NodeId node,
 std::string extractName(const FileContent* fC, NodeId node,
                         const std::string& defaultName = "<unknown>");
 
+//Извлечь параметр цикла
+//Используется для определения порпуска параметра
+std::string findForLoopVariableName(const FileContent* fC, NodeId forNode);
+
 //Извлечь имя переменной из шаблона Variable_decl_assignment.
 //Используется для поиска имен переменных в объявлениях.
 std::string extractVariableName(const FileContent* fC, NodeId parentNode);

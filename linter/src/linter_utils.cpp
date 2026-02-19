@@ -61,6 +61,39 @@ std::string extractName(const FileContent* fC, NodeId node,
   return defaultName;
 }
 
+std::string findForLoopVariableName(const FileContent* fC, NodeId forNode) {
+  if (!fC || !forNode) return "<unknown>";
+
+  NodeId forInit = InvalidNodeId;
+  NodeId condition = InvalidNodeId;
+  NodeId forStep = InvalidNodeId;
+
+  for (NodeId tmp = fC->Sibling(forNode); tmp; tmp = fC->Sibling(tmp)) {
+    VObjectType t = fC->Type(tmp);
+    if (t == VObjectType::paFor_initialization && !forInit) {
+      forInit = tmp;
+    } else if (t == VObjectType::paExpression && !condition) {
+      condition = tmp;
+    } else if (t == VObjectType::paFor_step && !forStep) {
+      forStep = tmp;
+    }
+  }
+
+  if (forInit) {
+    std::string name = extractName(fC, forInit, "");
+    if (!name.empty()) return name;
+  }
+  if (condition) {
+    std::string name = extractName(fC, condition, "");
+    if (!name.empty()) return name;
+  }
+  if (forStep) {
+    std::string name = extractName(fC, forStep, "");
+  }
+
+  return "<unknown>";
+}
+
 std::string extractVariableName(const FileContent* fC, NodeId parentNode) {
   if (!fC || !parentNode) return "<unknown>";
 

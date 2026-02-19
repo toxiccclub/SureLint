@@ -1,4 +1,4 @@
-#include "missing_for_loop_initialization.h"
+#include "missing_for_loop_step.h"
 
 #include <cstdint>
 #include <string>
@@ -14,9 +14,8 @@ using namespace SURELOG;
 
 namespace Analyzer {
 
-void checkMissingForLoopInitialization(const FileContent* fC,
-                                       ErrorContainer* errors,
-                                       SymbolTable* symbols) {
+void checkMissingForLoopStep(const FileContent* fC, ErrorContainer* errors,
+                             SymbolTable* symbols) {
   if (!fC || !errors || !symbols) return;
 
   NodeId root = fC->getRootNode();
@@ -27,22 +26,20 @@ void checkMissingForLoopInitialization(const FileContent* fC,
   for (NodeId forNode : forNodes) {
     if (!forNode) continue;
 
-    bool hasInitialization = false;
+    bool hasStep = false;
     for (NodeId tmp = fC->Sibling(forNode); tmp; tmp = fC->Sibling(tmp)) {
-      VObjectType t = fC->Type(tmp);
-      if (t == VObjectType::paFor_initialization) {
-        hasInitialization = true;
+      if (fC->Type(tmp) == VObjectType::paFor_step) {
+        hasStep = true;
         break;
       }
     }
 
-    if (hasInitialization) continue;
+    if (hasStep) continue;
 
     std::string varName = findForLoopVariableName(fC, forNode);
 
     reportError(fC, forNode, varName,
-                ErrorDefinition::LINT_MISSING_FOR_LOOP_INITIALIZATION, errors,
-                symbols);
+                ErrorDefinition::LINT_MISSING_FOR_LOOP_STEP, errors, symbols);
   }
 }
 
