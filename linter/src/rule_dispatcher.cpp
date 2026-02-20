@@ -12,6 +12,7 @@
 #include "dpi_decl_string.h"
 #include "empty_assignment_pattern.h"
 #include "fatal_rule.h"
+#include "foreach_loop_condition.h"
 #include "hierarchical_interface_identifier.h"
 #include "implicit_data_type.h"
 #include "missing_for_loop_condition.h"
@@ -45,6 +46,7 @@ void runAllRules(const FileContent* fC, ErrorContainer* errors,
   Analyzer::checkMissingForLoopInitialization(fC, errors, symbols);
   Analyzer::checkMissingForLoopCondition(fC, errors, symbols);
   Analyzer::checkMissingForLoopStep(fC, errors, symbols);
+  Analyzer::checkForeachLoopCondition(fC, errors, symbols);
 }
 
 void runAllRulesOnDesign(Design* design, const vpiHandle& UHDMdesign,

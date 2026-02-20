@@ -36,6 +36,7 @@ set(LINTER_SRC
     linter/src/missing_for_loop_initialization.cpp
     linter/src/missing_for_loop_condition.cpp
     linter/src/missing_for_loop_step.cpp
+    linter/src/foreach_loop_condition.cpp
 )
 
 foreach(f ${LINTER_SRC})
