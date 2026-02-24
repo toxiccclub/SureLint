@@ -46,6 +46,24 @@ The project is intended for static code analysis and checking compliance with co
 - `MULTIPLE_DOT_STAR_CONNECTIONS`  
   Dot start port connection '.*' cannot appear more than once in the port list
 
+- `SELECT_IN_EVENT_CONTROL`
+  Select in event control not allowed
+
+- `EMPTY_ASSIGNMENT_PATTERN`
+  Empty assignment pattern ‘{} not allowed
+
+- `MISSING_FOR_LOOP_INITIALIZATION`
+  ‘for’ loop variable initialization required
+
+- `MISSING_FOR_LOOP_CONDITION`
+  ‘for’ loop conditional expression required
+
+- `MISSING_FOR_LOOP_STEP` 
+  ‘for’ loop step required
+
+- `FOREACH_LOOP_CONDITION`
+  Multidimensional array select not allowed in foreach loop condition
+
 ---
 
 ## Project structure
