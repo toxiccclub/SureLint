@@ -17,7 +17,7 @@ int main(int argc, const char** argv) {
   clp->setElaborate(true);
   clp->setwritePpOutput(true);
   clp->setCacheAllowed(false);
-  // clp->setFilterInfo();
+  clp->setFilterInfo();
   clp->setFilterNote();
   clp->setFilterWarning();
 
@@ -40,6 +40,15 @@ int main(int argc, const char** argv) {
   runAllRulesOnDesign(the_design, UHDMdesign, errors, symbolTable);
 
   errors->printMessages(clp->muteStdout());
+
+  uint32_t errorCount = errors->getErrors().size();
+
+  if (errorCount == 0) {
+    std::cout << "Lint completed successfully. No issues found." << std::endl;
+  } else {
+    std::cout << "Lint finished with " << errorCount << " error(s)."
+              << std::endl;
+  }
 
   if (success && !clp->help()) {
     shutdown_compiler(compiler);
