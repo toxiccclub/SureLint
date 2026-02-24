@@ -18,22 +18,18 @@ void checkDpiDeclarationString(const FileContent* fC, ErrorContainer* errors,
                                SymbolTable* symbols) {
   NodeId root = fC->getRootNode();
 
-  // DPI-import/export
   auto dpiNodes = fC->sl_collect_all(root, VObjectType::paDpi_import_export);
 
   for (NodeId dpiId : dpiNodes) {
-    // Ищем IMPORT
     NodeId importNode = fC->Child(dpiId);
     if (!importNode || fC->Type(importNode) != VObjectType::paIMPORT) continue;
 
-    // Ищем StringLiteral
     NodeId stringNode = fC->Sibling(importNode);
     if (!stringNode || fC->Type(stringNode) != VObjectType::slStringLiteral)
       continue;
 
     std::string dpiStr = std::string(fC->SymName(stringNode));
 
-    // Убираем кавычки
     if (!dpiStr.empty() && dpiStr.front() == '"' && dpiStr.back() == '"') {
       dpiStr = dpiStr.substr(1, dpiStr.size() - 2);
     }

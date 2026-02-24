@@ -14,7 +14,6 @@ using namespace SURELOG;
 
 namespace Analyzer {
 
-// Рекурсивно проверяем, содержит ли узел DOTSTAR
 bool hasDotStarChild(const FileContent* fC, NodeId node) {
   if (!fC || !node) return false;
 
@@ -57,13 +56,10 @@ bool hasMultipleDotStarConnections(const FileContent* fC, NodeId instNode,
   while (child) {
     VObjectType type = fC->Type(child);
 
-    // Проверяем Named_port_connection
     if (type == VObjectType::paNamed_port_connection) {
-      // Проверяем, содержит ли этот узел DOTSTAR
       if (hasDotStarChild(fC, child)) {
         dotStarCount++;
         if (dotStarCount == 2) {
-          // Находим сам узел DOTSTAR для точной локации ошибки
           NodeId dotStarNode = fC->sl_collect(child, VObjectType::paDOTSTAR);
           secondDotStarNode = dotStarNode ? dotStarNode : child;
           return true;
@@ -82,7 +78,6 @@ void reportMultipleDotStarError(const FileContent* fC, NodeId badNode,
                                 SymbolTable* symbols) {
   if (!fC || !badNode || !errors || !symbols) return;
 
-  // Получить имя экземпляра
   std::string instanceName = "unknown";
   if (instanceNameNode) {
     instanceName = extractName(fC, instanceNameNode, "unknown");
@@ -101,7 +96,6 @@ void checkMultipleDotStarConnections(const FileContent* fC,
   NodeId root = fC->getRootNode();
   if (!root) return;
 
-  // Собираем все Module_instantiation
   auto instantiations =
       fC->sl_collect_all(root, VObjectType::paModule_instantiation);
 

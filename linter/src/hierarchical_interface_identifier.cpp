@@ -15,7 +15,6 @@ using namespace SURELOG;
 
 namespace Analyzer {
 
-// получить все StringConst внутри заданного узла
 static std::vector<NodeId> collectStringConsts(const FileContent* fC,
                                                NodeId node) {
   std::vector<NodeId> out;
@@ -24,7 +23,6 @@ static std::vector<NodeId> collectStringConsts(const FileContent* fC,
   return out;
 }
 
-// получить «объединенное» имя из списка StringConst (например, «top.id2.id3»)
 static std::string joinNames(const FileContent* fC,
                              const std::vector<NodeId>& parts) {
   if (parts.empty()) return "<unknown>";
@@ -41,13 +39,11 @@ void checkHierarchicalInterfaceIdentifier(const FileContent* fC,
                                           SymbolTable* symbols) {
   NodeId root = fC->getRootNode();
 
-  // Ищем interface_identifier
   auto iidNodes = fC->sl_collect_all(root, VObjectType::paInterface_identifier);
 
   for (NodeId iid : iidNodes) {
     auto parts = collectStringConsts(fC, iid);
 
-    // Если частей > 1 — это иерархическое имя → нарушение
     if (parts.size() > 1) {
       std::string fullName = joinNames(fC, parts);
       reportError(fC, iid, fullName,

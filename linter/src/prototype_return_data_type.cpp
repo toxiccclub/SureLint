@@ -14,12 +14,10 @@ using namespace SURELOG;
 
 namespace Analyzer {
 
-// Получить имя функции из Function_data_type_or_implicit
 std::string getFunctionName(const FileContent* fC, NodeId typeNode) {
   return extractName(fC, typeNode);
 }
 
-// Проверка наличия return type
 bool hasReturnType(const FileContent* fC, NodeId typeNode) {
   for (NodeId child = fC->Child(typeNode); child; child = fC->Sibling(child)) {
     if (fC->Type(child) == VObjectType::paFunction_data_type) {
@@ -29,7 +27,6 @@ bool hasReturnType(const FileContent* fC, NodeId typeNode) {
   return false;
 }
 
-// Проверка одного Function_prototype
 void checkFunctionPrototype(const FileContent* fC, NodeId protoId,
                             ErrorContainer* errors, SymbolTable* symbols) {
   auto ftypeNodes = fC->sl_collect_all(
@@ -50,7 +47,6 @@ void checkPrototypeReturnDataType(const FileContent* fC, ErrorContainer* errors,
                                   SymbolTable* symbols) {
   NodeId root = fC->getRootNode();
 
-  // 1. Классы
   auto classNodes = fC->sl_collect_all(root, VObjectType::paClass_declaration);
   for (NodeId classId : classNodes) {
     auto methods = fC->sl_collect_all(classId, VObjectType::paClass_method);
@@ -63,7 +59,6 @@ void checkPrototypeReturnDataType(const FileContent* fC, ErrorContainer* errors,
     }
   }
 
-  // 2. Интерфейсы
   auto interfaceNodes =
       fC->sl_collect_all(root, VObjectType::paInterface_declaration);
   for (NodeId ifaceId : interfaceNodes) {

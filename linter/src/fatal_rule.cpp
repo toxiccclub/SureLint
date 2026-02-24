@@ -1,5 +1,9 @@
 #include "fatal_rule.h"
 
+#include <uhdm/VpiListener.h>
+#include <uhdm/uhdm.h>
+#include <uhdm/vpi_user.h>
+
 #include <functional>
 #include <iostream>
 #include <set>
@@ -11,11 +15,6 @@
 #include "Surelog/ErrorReporting/ErrorContainer.h"
 #include "Surelog/SourceCompile/SymbolTable.h"
 
-// UHDM
-#include <uhdm/VpiListener.h>
-#include <uhdm/uhdm.h>
-#include <uhdm/vpi_user.h>
-
 using namespace SURELOG;
 
 void FatalListener::listen(const vpiHandle& design) {
@@ -26,7 +25,7 @@ void FatalListener::listen(const vpiHandle& design) {
 void FatalListener::enterSys_func_call(const UHDM::sys_func_call* object,
                                        vpiHandle handle) {
   if (!object) return;
-  if (seen_.count(object)) return;  // предотвращаем дубли
+  if (seen_.count(object)) return;
   seen_.insert(object);
 
   if (object->VpiName() != "$fatal") return;
@@ -60,7 +59,6 @@ void FatalListener::enterSys_func_call(const UHDM::sys_func_call* object,
   int val = 0;
   bool isInteger = false;
 
-  // CASE 1: constant
   if (auto c = dynamic_cast<UHDM::constant*>(firstArg)) {
     int ctype = c->VpiConstType();
     isInteger = (ctype == vpiIntConst || ctype == vpiDecConst ||
@@ -79,7 +77,6 @@ void FatalListener::enterSys_func_call(const UHDM::sys_func_call* object,
     }
   }
 
-  // CASE 2: unary +/- operation
   else if (auto op = dynamic_cast<UHDM::operation*>(firstArg)) {
     int opType = op->VpiOpType();
     if ((opType == vpiPlusOp || opType == vpiMinusOp) && op->Operands() &&
@@ -117,7 +114,6 @@ void FatalListener::enterSys_func_call(const UHDM::sys_func_call* object,
     errors_->addError(err, false);
   }
 
-  // SECOND ARG (message)
   if (args->size() > 1) {
     auto secondArg = (*args)[1];
     if (!dynamic_cast<UHDM::constant*>(secondArg)) {

@@ -53,19 +53,15 @@ void checkForeachLoopCondition(const FileContent* fC, ErrorContainer* errors,
   NodeId root = fC->getRootNode();
   if (!root) return;
 
-  // Собираем все FOREACH-ноды в файле
   auto foreachNodes = fC->sl_collect_all(root, VObjectType::paFOREACH);
 
   for (NodeId foreachNode : foreachNodes) {
     if (!foreachNode) continue;
 
-    // Многомерный выбор = больше одной группы скобок
     if (countForeachDimensionGroups(fC, foreachNode) <= 1) continue;
 
-    // Имя массива для сообщения об ошибке
     std::string arrayName = getForeachArrayName(fC, foreachNode);
 
-    // reportError() из linter_utils
     reportError(fC, foreachNode, arrayName,
                 ErrorDefinition::LINT_FOREACH_LOOP_CONDITION, errors, symbols);
   }

@@ -14,8 +14,6 @@ using namespace SURELOG;
 
 namespace Analyzer {
 
-// Внутри одного Sequence_expr не должно быть одновременно
-// paGoto_repetition и paNon_consecutive_repetition
 void checkRepetitionInSequence(const FileContent* fC, ErrorContainer* errors,
                                SymbolTable* symbols) {
   if (!fC) return;

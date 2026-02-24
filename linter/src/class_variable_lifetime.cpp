@@ -22,16 +22,13 @@ void checkClassVariableLifetime(const FileContent* fC, ErrorContainer* errors,
                                 SymbolTable* symbols) {
   NodeId root = fC->getRootNode();
 
-  // Ищем все Class_declaration
   auto classNodes = fC->sl_collect_all(root, VObjectType::paClass_declaration);
 
   for (NodeId classId : classNodes) {
-    // Ищем Class_property
     auto classProps =
         fC->sl_collect_all(classId, VObjectType::paClass_property);
 
     for (NodeId propId : classProps) {
-      // Ищем Lifetime_Automatic
       auto autoNodes =
           fC->sl_collect_all(propId, VObjectType::paLifetime_Automatic);
 

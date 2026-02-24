@@ -15,11 +15,9 @@ using namespace SURELOG;
 
 namespace Analyzer {
 
-// Собираем все константные параметры (parameter, localparam)
 std::set<std::string> collectConstantParameters(const FileContent* fC) {
   std::set<std::string> constants;
 
-  // 1. Собираем parameters
   auto paramDecls = fC->sl_collect_all(fC->getRootNode(),
                                        VObjectType::paParameter_declaration);
   for (NodeId paramDeclId : paramDecls) {
@@ -34,7 +32,6 @@ std::set<std::string> collectConstantParameters(const FileContent* fC) {
     }
   }
 
-  // 2. Собираем localparams
   auto localParamDecls = fC->sl_collect_all(
       fC->getRootNode(), VObjectType::paLocal_parameter_declaration);
   for (NodeId localParamId : localParamDecls) {
@@ -52,11 +49,9 @@ std::set<std::string> collectConstantParameters(const FileContent* fC) {
   return constants;
 }
 
-// Собираем все переменные
 std::set<std::string> collectVariables(const FileContent* fC) {
   std::set<std::string> variables;
 
-  // 1. Собираем переменные через Variable_declaration
   auto varDecls = fC->sl_collect_all(fC->getRootNode(),
                                      VObjectType::paVariable_declaration);
   for (NodeId varDeclId : varDecls) {
@@ -71,7 +66,6 @@ std::set<std::string> collectVariables(const FileContent* fC) {
     }
   }
 
-  // 2. Собираем Data_declaration
   auto dataDecls =
       fC->sl_collect_all(fC->getRootNode(), VObjectType::paData_declaration);
   for (NodeId dataDeclId : dataDecls) {
@@ -96,7 +90,6 @@ std::set<std::string> collectVariables(const FileContent* fC) {
   return variables;
 }
 
-// Рекурсивная проверка, является ли выражение константным
 bool isConstantExpression(const FileContent* fC, NodeId node,
                           const std::set<std::string>& constantParams,
                           const std::set<std::string>& variables,
@@ -105,7 +98,6 @@ bool isConstantExpression(const FileContent* fC, NodeId node,
 
   VObjectType type = fC->Type(node);
 
-  // 1. Узлы, явно помеченные как константные
   if (type == VObjectType::paConstant_expression ||
       type == VObjectType::paConstant_primary ||
       type == VObjectType::paConstant_mintypmax_expression ||
@@ -113,19 +105,16 @@ bool isConstantExpression(const FileContent* fC, NodeId node,
     return true;
   }
 
-  // 2. Числовые литералы всегда константы
   if (type == VObjectType::slIntConst || type == VObjectType::slRealConst ||
       type == VObjectType::paNumber_TickB0) {
     return true;
   }
 
-  // Дополнительные числовые типы
   if (type >= VObjectType::paNumber_1Tickb0 &&
       type <= VObjectType::paNumber_1TickB1) {
     return true;
   }
 
-  // 3. Идентификаторы
   if (type == VObjectType::slStringConst) {
     std::string name = std::string(fC->SymName(node));
 
@@ -143,21 +132,18 @@ bool isConstantExpression(const FileContent* fC, NodeId node,
     return true;
   }
 
-  // 4. Primary_literal
   if (type == VObjectType::paPrimary_literal) {
     NodeId child = fC->Child(node);
     return isConstantExpression(fC, child, constantParams, variables,
                                 nonConstantVar);
   }
 
-  // 5. Primary
   if (type == VObjectType::paPrimary) {
     NodeId child = fC->Child(node);
     return isConstantExpression(fC, child, constantParams, variables,
                                 nonConstantVar);
   }
 
-  // 6. Hierarchical_identifier или Ps_or_hierarchical_identifier
   if (type == VObjectType::paHierarchical_identifier ||
       type == VObjectType::paPs_or_hierarchical_identifier) {
     NodeId child = fC->Child(node);
@@ -165,7 +151,6 @@ bool isConstantExpression(const FileContent* fC, NodeId node,
                                 nonConstantVar);
   }
 
-  // 7. Expression
   if (type == VObjectType::paExpression) {
     for (NodeId child = fC->Child(node); child; child = fC->Sibling(child)) {
       VObjectType childType = fC->Type(child);
@@ -188,12 +173,10 @@ bool isConstantExpression(const FileContent* fC, NodeId node,
     return true;
   }
 
-  // 8. Constant_range и другие специальные конструкции
   if (type == VObjectType::paConstant_range) {
     return true;
   }
 
-  // 9. Mintypmax_expression
   if (type == VObjectType::paMintypmax_expression) {
     for (NodeId child = fC->Child(node); child; child = fC->Sibling(child)) {
       if (!isConstantExpression(fC, child, constantParams, variables,
@@ -214,7 +197,6 @@ bool isConstantExpression(const FileContent* fC, NodeId node,
   return true;
 }
 
-// Проверка одной конструкции {N{expr}}
 void checkSingleMultipleConcatenation(
     const FileContent* fC, NodeId multiConcatNode,
     const std::set<std::string>& constantParams,
@@ -234,7 +216,6 @@ void checkSingleMultipleConcatenation(
   }
 }
 
-// Основная функция проверки всех {N{expr}} в файле
 void checkConcatenationMultiplier(const FileContent* fC, ErrorContainer* errors,
                                   SymbolTable* symbols) {
   if (!fC || !errors || !symbols) return;

@@ -14,12 +14,10 @@ using namespace SURELOG;
 
 namespace Analyzer {
 
-// Извлечь имя переменной из Variable_decl_assignment
 std::string findVarName(const FileContent* fC, NodeId dataDecl) {
   return extractVariableName(fC, dataDecl);
 }
 
-// Проверка наличия явного типа
 bool hasExplicitType(const FileContent* fC, NodeId dataDecl) {
   static const VObjectType typeNodes[] = {
       VObjectType::paNet_type,          VObjectType::paData_type,
@@ -38,7 +36,6 @@ void checkImplicitDataTypeInDeclaration(const FileContent* fC,
                                         SymbolTable* symbols) {
   NodeId root = fC->getRootNode();
 
-  // Ищем Data_declaration
   auto dataDecls = fC->sl_collect_all(root, VObjectType::paData_declaration);
 
   for (NodeId dataDecl : dataDecls) {
@@ -48,7 +45,6 @@ void checkImplicitDataTypeInDeclaration(const FileContent* fC,
 
     if (hasExplicitType(fC, dataDecl)) continue;
 
-    // Error: IMPLICIT_DATA_TYPE_IN_DECLARATION
     std::string varName = findVarName(fC, dataDecl);
     NodeId where = packedDims.front();
 

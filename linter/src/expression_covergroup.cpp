@@ -14,7 +14,6 @@ using namespace SURELOG;
 
 namespace Analyzer {
 
-// Собираем все разрешённые имена (аргументы covergroup)
 std::set<std::string> getAllowedCovergroupArgs(const FileContent* fC,
                                                NodeId covergroupNode) {
   std::set<std::string> allowed;
@@ -44,7 +43,6 @@ std::set<std::string> getAllowedCovergroupArgs(const FileContent* fC,
   return allowed;
 }
 
-// Собираем все запрещённые имена (переменные модуля)
 std::set<std::string> getModuleVariables(const FileContent* fC) {
   std::set<std::string> moduleVars;
 
@@ -67,7 +65,6 @@ std::set<std::string> getModuleVariables(const FileContent* fC) {
   return moduleVars;
 }
 
-// Проверяем все идентификаторы в узле рекурсивно
 void checkIdentifiersRecursive(const FileContent* fC, NodeId node,
                                const std::set<std::string>& allowedArgs,
                                const std::set<std::string>& moduleVars,
@@ -96,7 +93,6 @@ void checkIdentifiersRecursive(const FileContent* fC, NodeId node,
   }
 }
 
-// Проверка bins внутри coverpoint
 void checkBinsInCoverpoint(const FileContent* fC, NodeId coverpointNode,
                            const std::set<std::string>& allowedArgs,
                            const std::set<std::string>& moduleVars,
@@ -131,7 +127,6 @@ void checkBinsInCoverpoint(const FileContent* fC, NodeId coverpointNode,
   }
 }
 
-// Основная функция проверки
 void checkCovergroupExpression(const FileContent* fC, ErrorContainer* errors,
                                SymbolTable* symbols) {
   NodeId root = fC->getRootNode();

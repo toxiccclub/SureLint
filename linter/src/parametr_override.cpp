@@ -24,7 +24,6 @@ bool isParameterOverrideValid(const FileContent* fC, NodeId instNode) {
 
   VObjectType secondType = fC->Type(secondChild);
 
-  // Недопустимо, если второй дочерний элемент является константой или литералом
   if (secondType == VObjectType::slIntConst ||
       secondType == VObjectType::slRealConst ||
       secondType == VObjectType::slStringConst ||
@@ -65,7 +64,6 @@ void checkParameterOverride(const FileContent* fC, ErrorContainer* errors,
   NodeId root = fC->getRootNode();
   if (!root) return;
 
-  // Собираем все Module_instantiation
   auto instantiations =
       fC->sl_collect_all(root, VObjectType::paModule_instantiation);
 
@@ -73,7 +71,6 @@ void checkParameterOverride(const FileContent* fC, ErrorContainer* errors,
     if (!inst) continue;
 
     if (!isParameterOverrideValid(fC, inst)) {
-      // Находим узел с некорректным значением
       NodeId moduleName = fC->Child(inst);
       NodeId badNode = fC->Sibling(moduleName);
 

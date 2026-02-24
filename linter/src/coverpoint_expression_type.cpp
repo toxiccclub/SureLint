@@ -36,8 +36,6 @@ bool isIntegralType(VObjectType type) {
 VObjectType getVariableType(const FileContent* fC, NodeId exprNode) {
   if (!exprNode) return VObjectType::slNoType;
 
-  // Находим идентификатор переменной (slStringConst) внутри выражения
-  // coverpoint
   NodeId idNode = exprNode;
   while (idNode && fC->Type(idNode) != VObjectType::slStringConst) {
     idNode = fC->Child(idNode);
@@ -46,7 +44,6 @@ VObjectType getVariableType(const FileContent* fC, NodeId exprNode) {
 
   std::string varName = std::string(fC->SymName(idNode));
 
-  // Ищем все объявления переменных
   auto varDeclNodes = fC->sl_collect_all(fC->getRootNode(),
                                          VObjectType::paVariable_declaration);
   for (NodeId varDeclId : varDeclNodes) {
@@ -68,7 +65,6 @@ VObjectType getVariableType(const FileContent* fC, NodeId exprNode) {
       }
     }
   }
-  //аргументы covergroup-функций
   auto tfItems =
       fC->sl_collect_all(fC->getRootNode(), VObjectType::paTf_port_item);
   for (NodeId tfId : tfItems) {
@@ -93,7 +89,6 @@ VObjectType getVariableType(const FileContent* fC, NodeId exprNode) {
   return VObjectType::slNoType;
 }
 
-// Проверка одного coverpoint
 void checkSingleCoverpoint(const FileContent* fC, NodeId cpId,
                            ErrorContainer* errors, SymbolTable* symbols) {
   NodeId exprNode;
@@ -107,7 +102,6 @@ void checkSingleCoverpoint(const FileContent* fC, NodeId cpId,
   }
   if (!exprNode) return;
 
-  // Получаем тип переменной через объявление
   VObjectType varType = getVariableType(fC, exprNode);
 
   if (!isIntegralType(varType)) {
@@ -118,7 +112,6 @@ void checkSingleCoverpoint(const FileContent* fC, NodeId cpId,
   }
 }
 
-// Основная функция проверки всех coverpoints
 void checkCoverpointExpressionType(const FileContent* fC,
                                    ErrorContainer* errors,
                                    SymbolTable* symbols) {

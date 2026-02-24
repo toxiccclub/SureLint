@@ -22,7 +22,6 @@ void checkParameterDynamicArray(const FileContent* fC, ErrorContainer* errors,
                                 SymbolTable* symbols) {
   NodeId root = fC->getRootNode();
 
-  // Типы объявления параметров
   std::vector<VObjectType> declTypes = {
       VObjectType::paParameter_declaration,
       VObjectType::paLocal_parameter_declaration};
@@ -37,7 +36,6 @@ void checkParameterDynamicArray(const FileContent* fC, ErrorContainer* errors,
           fC->sl_collect_all(decl, VObjectType::paUnsized_dimension);
 
       if (!unsizedDims.empty()) {
-        // First error node
         NodeId errNode = unsizedDims[0];
         reportError(fC, errNode, paramName,
                     ErrorDefinition::LINT_PARAMETR_DYNAMIC_ARRAY, errors,
