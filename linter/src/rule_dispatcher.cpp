@@ -6,6 +6,7 @@
 #include "Surelog/Design/FileContent.h"
 #include "Surelog/SourceCompile/VObjectTypes.h"
 #include "assignment_pattern.h"
+#include "assignment_pattern_context.h"
 #include "class_variable_lifetime.h"
 #include "concatenation_multiplier.h"
 #include "covergroup_expression.h"
@@ -51,6 +52,7 @@ void runAllRules(const FileContent* fC, ErrorContainer* errors,
   Analyzer::checkForeachLoopCondition(fC, errors, symbols);
   Analyzer::checkSelectInWeight(fC, errors, symbols);
   Analyzer::checkAssignmentPattern(fC, errors, symbols);
+  Analyzer::checkAssignmentPatternContext(fC, errors, symbols);
 }
 
 void runAllRulesOnDesign(Design* design, const vpiHandle& UHDMdesign,

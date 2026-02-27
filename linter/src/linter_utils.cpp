@@ -137,4 +137,48 @@ std::string trim(const std::string& s) {
   return s.substr(start, end - start + 1);
 }
 
+std::string findLhsVariableName(const FileContent* fC, NodeId startNode) {
+  if (!fC || !startNode) return "<unknown>";
+
+  NodeId current = startNode;
+  while (current) {
+    VObjectType type = fC->Type(current);
+
+    if (type == VObjectType::paOperator_assignment ||
+        type == VObjectType::paBlocking_assignment ||
+        type == VObjectType::paNonblocking_assignment ||
+        type == VObjectType::paNet_assignment) {
+      for (NodeId child = fC->Child(current); child;
+           child = fC->Sibling(child)) {
+        VObjectType ct = fC->Type(child);
+        if (ct == VObjectType::paVariable_lvalue ||
+            ct == VObjectType::paNet_lvalue) {
+          return extractName(fC, child);
+        }
+      }
+      break;
+    }
+
+    if (type == VObjectType::paVariable_decl_assignment) {
+      NodeId nameNode = fC->Child(current);
+      if (nameNode && fC->Type(nameNode) == VObjectType::slStringConst) {
+        return std::string(fC->SymName(nameNode));
+      }
+      break;
+    }
+
+    if (type == VObjectType::paNet_decl_assignment) {
+      NodeId nameNode = fC->Child(current);
+      if (nameNode && fC->Type(nameNode) == VObjectType::slStringConst) {
+        return std::string(fC->SymName(nameNode));
+      }
+      break;
+    }
+
+    current = fC->Parent(current);
+  }
+
+  return "<unknown>";
+}
+
 }  // namespace Analyzer

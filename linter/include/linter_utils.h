@@ -45,4 +45,6 @@ std::string extractParameterName(const FileContent* fC, NodeId parentNode);
 
 std::string trim(const std::string& s);
 
+std::string findLhsVariableName(const FileContent* fC, NodeId startNode);
+
 }  // namespace Analyzer

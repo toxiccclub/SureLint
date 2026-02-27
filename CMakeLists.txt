@@ -39,6 +39,7 @@ set(LINTER_SRC
     linter/src/foreach_loop_condition.cpp
     linter/src/select_in_weight.cpp
     linter/src/assignment_pattern.cpp
+    linter/src/assignment_pattern_context.cpp
 )
 
 foreach(f ${LINTER_SRC})

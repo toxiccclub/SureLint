@@ -14,30 +14,6 @@ using namespace SURELOG;
 
 namespace Analyzer {
 
-static std::string findLhsVariableName(const FileContent* fC,
-                                       NodeId patternNode) {
-  if (!fC || !patternNode) return "<unknown>";
-
-  NodeId current = patternNode;
-  while (current) {
-    VObjectType type = fC->Type(current);
-    if (type == VObjectType::paOperator_assignment ||
-        type == VObjectType::paBlocking_assignment ||
-        type == VObjectType::paNonblocking_assignment) {
-      for (NodeId child = fC->Child(current); child;
-           child = fC->Sibling(child)) {
-        if (fC->Type(child) == VObjectType::paVariable_lvalue) {
-          return extractName(fC, child);
-        }
-      }
-      break;
-    }
-    current = fC->Parent(current);
-  }
-
-  return "<unknown>";
-}
-
 void checkEmptyAssignmentPattern(const FileContent* fC, ErrorContainer* errors,
                                  SymbolTable* symbols) {
   if (!fC || !errors || !symbols) return;
