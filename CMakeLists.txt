@@ -40,6 +40,7 @@ set(LINTER_SRC
     linter/src/select_in_weight.cpp
     linter/src/assignment_pattern.cpp
     linter/src/assignment_pattern_context.cpp
+    linter/src/scalar_assignment_pattern.cpp
 )
 
 foreach(f ${LINTER_SRC})

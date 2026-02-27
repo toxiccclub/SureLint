@@ -25,6 +25,7 @@
 #include "parameter_override.h"
 #include "prototype_return_data_type.h"
 #include "repeat_in_sequence.h"
+#include "scalar_assignment_pattern.h"
 #include "select_in_event_control.h"
 #include "select_in_weight.h"
 
@@ -53,6 +54,7 @@ void runAllRules(const FileContent* fC, ErrorContainer* errors,
   Analyzer::checkSelectInWeight(fC, errors, symbols);
   Analyzer::checkAssignmentPattern(fC, errors, symbols);
   Analyzer::checkAssignmentPatternContext(fC, errors, symbols);
+  Analyzer::checkScalarAssignmentPattern(fC, errors, symbols);
 }
 
 void runAllRulesOnDesign(Design* design, const vpiHandle& UHDMdesign,
