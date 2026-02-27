@@ -24,6 +24,7 @@
 #include "prototype_return_data_type.h"
 #include "repeat_in_sequence.h"
 #include "select_in_event_control.h"
+#include "select_in_weight.h"
 
 using namespace SURELOG;
 
@@ -47,6 +48,7 @@ void runAllRules(const FileContent* fC, ErrorContainer* errors,
   Analyzer::checkMissingForLoopCondition(fC, errors, symbols);
   Analyzer::checkMissingForLoopStep(fC, errors, symbols);
   Analyzer::checkForeachLoopCondition(fC, errors, symbols);
+  Analyzer::checkSelectInWeight(fC, errors, symbols);
 }
 
 void runAllRulesOnDesign(Design* design, const vpiHandle& UHDMdesign,

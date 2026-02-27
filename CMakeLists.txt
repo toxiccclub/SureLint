@@ -37,6 +37,7 @@ set(LINTER_SRC
     linter/src/missing_for_loop_condition.cpp
     linter/src/missing_for_loop_step.cpp
     linter/src/foreach_loop_condition.cpp
+    linter/src/select_in_weight.cpp
 )
 
 foreach(f ${LINTER_SRC})
