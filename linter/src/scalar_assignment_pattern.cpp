@@ -12,20 +12,33 @@ using namespace SURELOG;
 
 namespace Analyzer {
 
-static bool is1BitScalarType(VObjectType type) {
+static bool is1BitScalarKeyword(VObjectType type) {
   return type == VObjectType::paIntVec_TypeBit ||
          type == VObjectType::paIntVec_TypeLogic ||
          type == VObjectType::paIntVec_TypeReg;
 }
 
+static NodeId findEnclosingModule(const FileContent* fC, NodeId node) {
+  NodeId current = fC->Parent(node);
+  while (current) {
+    if (fC->Type(current) == VObjectType::paModule_declaration) return current;
+    current = fC->Parent(current);
+  }
+  return InvalidNodeId;
+}
+
 static bool isScalarVariable(const FileContent* fC, NodeId root,
-                             const std::string& varName) {
+                             NodeId patternNode, const std::string& varName) {
   if (varName.empty() || varName == "<unknown>") return false;
+
+  NodeId patternModule = findEnclosingModule(fC, patternNode);
 
   auto varDecls = fC->sl_collect_all(root, VObjectType::paVariable_declaration);
 
   for (NodeId vd : varDecls) {
     if (!vd) continue;
+
+    if (findEnclosingModule(fC, vd) != patternModule) continue;
 
     if (extractVariableName(fC, vd) != varName) continue;
 
@@ -33,20 +46,31 @@ static bool isScalarVariable(const FileContent* fC, NodeId root,
     if (!dataType) continue;
 
     NodeId typeKeyword = fC->Child(dataType);
-    if (!typeKeyword) continue;
+    if (!typeKeyword || !is1BitScalarKeyword(fC->Type(typeKeyword))) continue;
 
-    if (!is1BitScalarType(fC->Type(typeKeyword))) continue;
-
-    if (!fC->sl_collect_all(dataType, VObjectType::paPacked_dimension).empty())
-      continue;
+    bool hasPacked = false;
+    for (NodeId s = fC->Sibling(typeKeyword); s; s = fC->Sibling(s)) {
+      if (fC->Type(s) == VObjectType::paPacked_dimension) {
+        hasPacked = true;
+        break;
+      }
+    }
+    if (hasPacked) continue;
 
     auto vdas = fC->sl_collect_all(vd, VObjectType::paVariable_decl_assignment);
     bool hasUnpacked = false;
     for (NodeId vda : vdas) {
-      if (!fC->sl_collect_all(vda, VObjectType::paUnpacked_dimension).empty()) {
-        hasUnpacked = true;
-        break;
+      NodeId nameNode = fC->Child(vda);
+      if (!nameNode) continue;
+      for (NodeId s = fC->Sibling(nameNode); s; s = fC->Sibling(s)) {
+        VObjectType st = fC->Type(s);
+        if (st == VObjectType::paUnpacked_dimension ||
+            st == VObjectType::paVariable_dimension) {
+          hasUnpacked = true;
+          break;
+        }
       }
+      if (hasUnpacked) break;
     }
     if (hasUnpacked) continue;
 
@@ -70,7 +94,7 @@ void checkScalarAssignmentPattern(const FileContent* fC, ErrorContainer* errors,
 
     std::string varName = findLhsVariableName(fC, pat);
 
-    if (isScalarVariable(fC, root, varName)) {
+    if (isScalarVariable(fC, root, pat, varName)) {
       reportError(fC, pat, varName,
                   ErrorDefinition::LINT_SCALAR_ASSIGNMENT_PATTERN, errors,
                   symbols);

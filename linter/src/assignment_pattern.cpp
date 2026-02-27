@@ -1,5 +1,6 @@
 #include "assignment_pattern.h"
 
+#include <set>
 #include <string>
 
 #include "Surelog/Design/FileContent.h"
@@ -12,12 +13,22 @@ using namespace SURELOG;
 
 namespace Analyzer {
 
-static bool isStructVariable(const FileContent* fC, NodeId root,
+static NodeId findEnclosingModule(const FileContent* fC, NodeId node) {
+  NodeId current = fC->Parent(node);
+  while (current) {
+    if (fC->Type(current) == VObjectType::paModule_declaration) return current;
+    current = fC->Parent(current);
+  }
+  return InvalidNodeId;
+}
+
+static bool isStructVariable(const FileContent* fC, NodeId moduleRoot,
                              const std::string& varName) {
   if (varName.empty() || varName == "<unknown>") return false;
 
   std::set<std::string> structTypeNames;
-  auto typeDecls = fC->sl_collect_all(root, VObjectType::paType_declaration);
+  auto typeDecls =
+      fC->sl_collect_all(moduleRoot, VObjectType::paType_declaration);
   for (NodeId td : typeDecls) {
     if (!td) continue;
     if (fC->sl_collect_all(td, VObjectType::paStruct_union).empty()) continue;
@@ -27,7 +38,8 @@ static bool isStructVariable(const FileContent* fC, NodeId root,
     }
   }
 
-  auto varDecls = fC->sl_collect_all(root, VObjectType::paVariable_declaration);
+  auto varDecls =
+      fC->sl_collect_all(moduleRoot, VObjectType::paVariable_declaration);
   for (NodeId vd : varDecls) {
     if (!vd) continue;
     if (extractVariableName(fC, vd) != varName) continue;
@@ -44,7 +56,8 @@ static bool isStructVariable(const FileContent* fC, NodeId root,
       return true;
   }
 
-  auto netDecls = fC->sl_collect_all(root, VObjectType::paNet_declaration);
+  auto netDecls =
+      fC->sl_collect_all(moduleRoot, VObjectType::paNet_declaration);
   for (NodeId nd : netDecls) {
     if (!nd) continue;
 
@@ -73,11 +86,12 @@ static bool isStructVariable(const FileContent* fC, NodeId root,
   return false;
 }
 
-static bool isArrayVariable(const FileContent* fC, NodeId root,
+static bool isArrayVariable(const FileContent* fC, NodeId moduleRoot,
                             const std::string& varName) {
   if (varName.empty() || varName == "<unknown>") return false;
 
-  auto vdas = fC->sl_collect_all(root, VObjectType::paVariable_decl_assignment);
+  auto vdas =
+      fC->sl_collect_all(moduleRoot, VObjectType::paVariable_decl_assignment);
   for (NodeId vda : vdas) {
     if (!vda) continue;
     NodeId nameNode = fC->Child(vda);
@@ -87,7 +101,8 @@ static bool isArrayVariable(const FileContent* fC, NodeId root,
       return true;
   }
 
-  auto netDecls = fC->sl_collect_all(root, VObjectType::paNet_declaration);
+  auto netDecls =
+      fC->sl_collect_all(moduleRoot, VObjectType::paNet_declaration);
   for (NodeId nd : netDecls) {
     if (!nd) continue;
     if (fC->sl_collect_all(nd, VObjectType::paUnpacked_dimension).empty())
@@ -117,6 +132,9 @@ void checkAssignmentPattern(const FileContent* fC, ErrorContainer* errors,
   for (NodeId concat : concats) {
     if (!concat) continue;
 
+    NodeId moduleRoot = findEnclosingModule(fC, concat);
+    if (!moduleRoot) continue;
+
     bool hasLabel = false;
     for (NodeId child = fC->Child(concat); child; child = fC->Sibling(child)) {
       if (fC->Type(child) == VObjectType::paArray_member_label) {
@@ -133,8 +151,8 @@ void checkAssignmentPattern(const FileContent* fC, ErrorContainer* errors,
     }
 
     std::string varName = findLhsVariableName(fC, concat);
-    if (isStructVariable(fC, root, varName) ||
-        isArrayVariable(fC, root, varName)) {
+    if (isStructVariable(fC, moduleRoot, varName) ||
+        isArrayVariable(fC, moduleRoot, varName)) {
       reportError(fC, concat, varName, ErrorDefinition::LINT_ASSIGNMENT_PATTERN,
                   errors, symbols);
     }

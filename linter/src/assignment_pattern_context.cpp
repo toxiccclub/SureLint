@@ -12,28 +12,45 @@ using namespace SURELOG;
 
 namespace Analyzer {
 
+static bool isHardWrapper(VObjectType type) {
+  switch (type) {
+    case VObjectType::paAssignment_pattern_expression:
+    case VObjectType::paConstant_assignment_pattern_expression:
+    case VObjectType::paPrimary:
+    case VObjectType::paConstant_primary:
+    case VObjectType::paConstant_expression:
+    case VObjectType::paConstant_mintypmax_expression:
+    case VObjectType::paConstant_param_expression:
+      return true;
+    default:
+      return false;
+  }
+}
+
 static bool isValidAssignmentContext(VObjectType type) {
   return type == VObjectType::paOperator_assignment ||
          type == VObjectType::paBlocking_assignment ||
          type == VObjectType::paNonblocking_assignment ||
          type == VObjectType::paNet_assignment ||
+         type == VObjectType::paNet_decl_assignment ||
          type == VObjectType::paVariable_decl_assignment ||
          type == VObjectType::paParam_assignment ||
          type == VObjectType::paContinuous_assign;
 }
 
 static NodeId findDirectContext(const FileContent* fC, NodeId patternNode) {
-  static const VObjectType kWrappers[] = {
-      VObjectType::paAssignment_pattern_expression,
-      VObjectType::paPrimary,
-      VObjectType::paExpression,
-  };
-
   NodeId current = fC->Parent(patternNode);
-  for (VObjectType expected : kWrappers) {
-    if (!current) return InvalidNodeId;
-    if (fC->Type(current) != expected) return current;
+
+  while (current && isHardWrapper(fC->Type(current))) {
     current = fC->Parent(current);
+  }
+
+  if (current && fC->Type(current) == VObjectType::paExpression) {
+    NodeId parent = fC->Parent(current);
+    if (parent && isValidAssignmentContext(fC->Type(parent))) {
+      return parent;
+    }
+    return current;
   }
 
   return current;
