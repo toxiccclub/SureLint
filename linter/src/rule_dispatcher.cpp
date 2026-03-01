@@ -28,6 +28,7 @@
 #include "scalar_assignment_pattern.h"
 #include "select_in_event_control.h"
 #include "select_in_weight.h"
+#include "target_unpacked_array_concatenation.h"
 
 using namespace SURELOG;
 
@@ -55,6 +56,7 @@ void runAllRules(const FileContent* fC, ErrorContainer* errors,
   Analyzer::checkAssignmentPattern(fC, errors, symbols);
   Analyzer::checkAssignmentPatternContext(fC, errors, symbols);
   Analyzer::checkScalarAssignmentPattern(fC, errors, symbols);
+  Analyzer::checkTargetUnpackedArrayConcatenation(fC, errors, symbols);
 }
 
 void runAllRulesOnDesign(Design* design, const vpiHandle& UHDMdesign,

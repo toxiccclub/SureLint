@@ -41,6 +41,7 @@ set(LINTER_SRC
     linter/src/assignment_pattern.cpp
     linter/src/assignment_pattern_context.cpp
     linter/src/scalar_assignment_pattern.cpp
+    linter/src/target_array_unpacked_concatenation.cpp
 )
 
 foreach(f ${LINTER_SRC})
