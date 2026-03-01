@@ -181,4 +181,13 @@ std::string findLhsVariableName(const FileContent* fC, NodeId startNode) {
   return "<unknown>";
 }
 
+NodeId findEnclosingModule(const FileContent* fC, NodeId node) {
+  NodeId current = fC->Parent(node);
+  while (current) {
+    if (fC->Type(current) == VObjectType::paModule_declaration) return current;
+    current = fC->Parent(current);
+  }
+  return InvalidNodeId;
+}
+
 }  // namespace Analyzer

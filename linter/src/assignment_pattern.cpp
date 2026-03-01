@@ -13,15 +13,6 @@ using namespace SURELOG;
 
 namespace Analyzer {
 
-static NodeId findEnclosingModule(const FileContent* fC, NodeId node) {
-  NodeId current = fC->Parent(node);
-  while (current) {
-    if (fC->Type(current) == VObjectType::paModule_declaration) return current;
-    current = fC->Parent(current);
-  }
-  return InvalidNodeId;
-}
-
 static bool isStructVariable(const FileContent* fC, NodeId moduleRoot,
                              const std::string& varName) {
   if (varName.empty() || varName == "<unknown>") return false;

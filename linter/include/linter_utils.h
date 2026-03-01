@@ -47,4 +47,6 @@ std::string trim(const std::string& s);
 
 std::string findLhsVariableName(const FileContent* fC, NodeId startNode);
 
+NodeId findEnclosingModule(const FileContent* fC, NodeId node);
+
 }  // namespace Analyzer

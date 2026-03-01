@@ -18,15 +18,6 @@ static bool is1BitScalarKeyword(VObjectType type) {
          type == VObjectType::paIntVec_TypeReg;
 }
 
-static NodeId findEnclosingModule(const FileContent* fC, NodeId node) {
-  NodeId current = fC->Parent(node);
-  while (current) {
-    if (fC->Type(current) == VObjectType::paModule_declaration) return current;
-    current = fC->Parent(current);
-  }
-  return InvalidNodeId;
-}
-
 static bool isScalarVariable(const FileContent* fC, NodeId root,
                              NodeId patternNode, const std::string& varName) {
   if (varName.empty() || varName == "<unknown>") return false;
