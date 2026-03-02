@@ -17,6 +17,8 @@
 #include "foreach_loop_condition.h"
 #include "hierarchical_interface_identifier.h"
 #include "implicit_data_type.h"
+#include "inside_operator.h"
+#include "inside_operator_range.h"
 #include "missing_for_loop_condition.h"
 #include "missing_for_loop_initialization.h"
 #include "missing_for_loop_step.h"
@@ -57,6 +59,8 @@ void runAllRules(const FileContent* fC, ErrorContainer* errors,
   Analyzer::checkAssignmentPatternContext(fC, errors, symbols);
   Analyzer::checkScalarAssignmentPattern(fC, errors, symbols);
   Analyzer::checkTargetUnpackedArrayConcatenation(fC, errors, symbols);
+  Analyzer::checkInsideOperator(fC, errors, symbols);
+  Analyzer::checkInsideOperatorRange(fC, errors, symbols);
 }
 
 void runAllRulesOnDesign(Design* design, const vpiHandle& UHDMdesign,
