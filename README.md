@@ -46,46 +46,46 @@ The project is intended for static code analysis and checking compliance with co
 - `MULTIPLE_DOT_STAR_CONNECTIONS`  
   Dot start port connection '.*' cannot appear more than once in the port list
 
-- `SELECT_IN_EVENT_CONTROL`
+- `SELECT_IN_EVENT_CONTROL`  
   Select in event control not allowed
 
-- `EMPTY_ASSIGNMENT_PATTERN`
+- `EMPTY_ASSIGNMENT_PATTERN`  
   Empty assignment pattern ‘{} not allowed
 
-- `MISSING_FOR_LOOP_INITIALIZATION`
+- `MISSING_FOR_LOOP_INITIALIZATION`  
   ‘for’ loop variable initialization required
 
-- `MISSING_FOR_LOOP_CONDITION`
+- `MISSING_FOR_LOOP_CONDITION`  
   ‘for’ loop conditional expression required
 
-- `MISSING_FOR_LOOP_STEP` 
+- `MISSING_FOR_LOOP_STEP`  
   ‘for’ loop step required
 
-- `FOREACH_LOOP_CONDITION`
+- `FOREACH_LOOP_CONDITION`  
   Multidimensional array select not allowed in foreach loop condition
 
-- `SELECT_IN_WEIGHT`
+- `SELECT_IN_WEIGHT`  
   Select in weight specification not allowed
 
-- `ASSIGNMENT_PATTERN`
+- `ASSIGNMENT_PATTERN`  
   Expecting assignment pattern '{…} instead of concatenation
 
-- `ASSIGNMENT_PATTERN_CONTEXT`
+- `ASSIGNMENT_PATTERN_CONTEXT`  
   Assignment pattern not allowed outside assignment-like context (could not determine data type)
 
-- `SCALAR_ASSIGNMENT_PATTERN`
+- `SCALAR_ASSIGNMENT_PATTERN`  
   Variable of 1-bit scalar type # not allowed as target of assignment pattern
 
-- `TARGET_UNPACKED_ARRAY_CONCATENATION`
+- `TARGET_UNPACKED_ARRAY_CONCATENATION`  
   Unpacked array concatenation not allowed as target expression
 
-- `INSIDE_OPERATOR`
+- `INSIDE_OPERATOR`  
   'inside' operator in constant expression not allowed
 
-- `INSIDE_OPERATOR_RANGE`
+- `INSIDE_OPERATOR_RANGE`  
   Expecting curly braces {} around 'inside' operator range
 
-- `TYPE_CASTING`
+- `TYPE_CASTING`  
   Expecting tick before type casting expression
 
 ---
